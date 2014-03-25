@@ -1,0 +1,38 @@
+[17:28:14] [Server thread/INFO]: Starting minecraft server version 1.7.2
+[17:28:14] [Server thread/INFO]: Loading properties
+[17:28:14] [Server thread/INFO]: Default game type: SURVIVAL
+[17:28:14] [Server thread/INFO]: Generating keypair
+[17:28:15] [Server thread/INFO]: Starting Minecraft server on 192.169.0.1:25566
+[17:28:15] [Server thread/WARN]: Failed to load operators list: java.io.FileNotFoundException: ./ops.txt (No such file or directory)
+[17:28:15] [Server thread/INFO]: Preparing level "testlog"
+[17:28:15] [Server thread/INFO]: Preparing start region for level 0
+[17:28:16] [Server thread/INFO]: Preparing spawn area: 6%
+[17:28:27] [Server thread/INFO]: Preparing spawn area: 95%
+[17:28:28] [Server thread/INFO]: Done (13,234s)! For help, type "help" or "?"
+[17:29:13] [User Authenticator #1/INFO]: UUID of player herobrine is 42424242
+[17:29:13] [Server thread/INFO]: herobrine[/192.169.0.2:49390] logged in with entity id 3245 at (-186.5, 181.0, 257.5)
+[17:29:13] [Server thread/INFO]: herobrine joined the game
+[17:29:43] [Server thread/INFO]: herobrine fell from a high place
+[17:30:09] [Server thread/INFO]: herobrine fell from a high place
+[17:30:35] [Server thread/INFO]: herobrine fell out of the world
+[17:30:49] [Server thread/INFO]: herobrine lost connection: TextComponent{text='Disconnected', siblings=[], style=Style{hasParent=false, color=null, bold=null, italic=null, underlined=null, obfuscated=null, clickEvent=null, hoverEvent=null}}
+[17:30:49] [Server thread/INFO]: herobrine left the game
+[17:36:51] [User Authenticator #2/INFO]: UUID of player herobrine is 42424242
+[17:36:51] [Server thread/INFO]: herobrine[/192.169.0.2:49710] logged in with entity id 44972 at (-212.01158965192414, 192.0, 249.1278095684763)
+[17:36:51] [Server thread/INFO]: herobrine joined the game
+[17:53:28] [Server thread/INFO]: Kicked herobrine from the game: 'cause I can'
+[17:53:28] [Server thread/INFO]: herobrine lost connection: TextComponent{text='cause I can', siblings=[], style=Style{hasParent=false, color=null, bold=null, italic=null, underlined=null, obfuscated=null, clickEvent=null, hoverEvent=null}}
+[17:53:28] [Server thread/INFO]: herobrine left the game
+[17:53:33] [User Authenticator #3/INFO]: UUID of player herobrine is 42424242
+[17:53:33] [Server thread/INFO]: herobrine[/192.169.0.2:49939] logged in with entity id 594209 at (-237.50359156210575, 71.35728659248507, 113.84017110604627)
+[17:53:33] [Server thread/INFO]: herobrine joined the game
+[18:10:27] [User Authenticator #4/INFO]: UUID of player evilbrine is 23232323
+[18:10:27] [Server thread/INFO]: evilbrine[/192.169.0.3:41262] logged in with entity id 946016 at (-192.5, 68.0, 246.5)
+[18:10:27] [Server thread/INFO]: evilbrine joined the game
+[18:11:49] [Server thread/INFO]: Stopping the server
+[18:11:49] [Server thread/INFO]: Stopping server
+[18:11:49] [Server thread/INFO]: Saving players
+[18:11:49] [Server thread/INFO]: Saving worlds
+[18:11:49] [Server thread/INFO]: Saving chunks for level 'testlog'/Overworld
+[18:11:49] [Server thread/INFO]: Saving chunks for level 'testlog'/Nether
+[18:11:49] [Server thread/INFO]: Saving chunks for level 'testlog'/The End

@@ -13,7 +13,7 @@ class regex:
   """
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  date = re.compile("\[(\d\d):(\d\d):(\d\d)\]")
+  time = re.compile("\[(\d\d):(\d\d):(\d\d)\]")
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
   login = re.compile("(\S+) joined the game")
@@ -106,38 +106,42 @@ def process_logins(raw_data):
   return logins
 #  return {'herobrine': 42}
 
-def test_regexes(raw_data):
+def test_regexes():
   """
-  text_regexes is used to test the regexes used to find stuff in the logfiles. Atm this uses a logfile that is not included in the repo, maybe at some point another logfile for testing will be included. (-;
+  text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every regex.
   """
-  raw = copy.deepcopy(raw_data)
-  raw = raw[0].split('\n')
-  date = re.search(regex.date, raw[0])
-  if date:
-    print 'date:', date.group(1), date.group(2), date.group(3)
+  logfile = read_logfiles(['test.log'])[0].split('\n')
+  # FIXME make loops and got through the file, break once one is found
+  for line in logfile:
+    time = re.search(regex.time, line)
+    if time:
+      print 'time:', time.group(1), time.group(2), time.group(3)
 
-  user = re.search(regex.login, raw[23])
-  if user:
-    print 'login:', user.group(1)
+  for line in logfile:
+    user = re.search(regex.login, line)
+    if user:
+      print 'login:', user.group(1)
+      break
+  for line in logfile:
+    user = re.search(regex.logout, line)
+    if user:
+      print 'logout:', user.group(1)
+      break
+  for line in logfile:
+    user = re.search(regex.kick, line)
+    if user:
+      print 'kick:', user.group(1)
+      break
+  for line in logfile:
+    user = re.search(regex.con_lost, line)
+    if user:
+      print 'lost connection:', user.group(1)
+      break
+  for line in logfile:
+    serverstop = re.search(regex.stop, line)
+    if serverstop:
+      print 'serverstop:', True
 
-  user = re.search(regex.logout, raw[31])
-  if user:
-    print 'logout:', user.group(1)
-
-  user = re.search(regex.kick, raw[47])
-  if user:
-    print 'kick:', user.group(1)
-
-  user = re.search(regex.con_lost, raw[48])
-  if user:
-    print 'lost connection:', user.group(1)
-
-  serverstop = re.search(regex.stop, raw[57])
-  if serverstop:
-    print 'serverstop 1:', True
-  serverstop = re.search(regex.stop, raw[58])
-  if serverstop:
-    print 'serverstop 2:', True
   return
 
 def print_help():
@@ -191,7 +195,7 @@ def main():
 
   # this is just to test the regexes against a logfile
   if '--test' in args:
-    test_regexes(read_logfiles(['test.log']))
+    test_regexes()
     exit(0)
 
   if not args:
