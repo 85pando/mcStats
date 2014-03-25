@@ -147,12 +147,17 @@ def test_regexes():
     if serverstop:
       print '\tserverstop:', True
 
-def print_dict(dictionary, string=None, sort_key=None):
+def print_dict(dictionary, string=None, sort_list=None):
+  """
+  print_dict prints a dictionary in a nicely readable manner. string will be printed as a header, if given. The sort_list can be used to sort the dictionary differently. By default it will be sorted naturally after the key. This can be used to sort by the value or similar.
+  """
   if string:
     print font.bold + string + font.normal
-  if not sort_key:
-    sort_key = sorted(dictionary)
-  for name in sort_key:
+  else:
+    print 'Output:'
+  if not sort_list:
+    sort_list = sorted(dictionary)
+  for name in sort_list:
     print '\t', name + ':', dictionary[name]
   return
 
