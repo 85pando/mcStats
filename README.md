@@ -1,10 +1,11 @@
 # Minecraft Statistics
 
-This programm will creates statistics for your minecraft server.
+This programm will create statistics for your minecraft server.
 
 ## Features
 
 * mcStats can read log files. It does not matter, if they are plaintex (.log) or zipped (.gz). Several option included, simple help included. Most options do nothing at the moment.  )-:
+* --logins: counts the logins of each user
 
 ## Usage
 

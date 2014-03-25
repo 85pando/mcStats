@@ -7,23 +7,31 @@ import gzip
 import re
 import copy
 
-"""
-This are the regexes used in the script
-"""
-
 class regex:
+  """
+  The regex class includes the regexes used to find certain things in the logs.
+  """
   # this regex is supposed to find the date
+  # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
   date = re.compile("\[(\d\d):(\d\d):(\d\d)\]")
   # this regex finds a login
+  # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
   login = re.compile("(\S+) joined the game")
   # this regex finds a logout
+  # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
   logout = re.compile("(\S+) left the game")
   # this regex finds kick events
+  # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
   kick = re.compile("Kicked (\S+) from the game")
   # this regex finds a server stop
+  # ex: [10:42:23] [Server thread/INFO]: Stopping the server
+  # ex: [10:42:23] [Server thread/INFO]: Stopping server
   stop = re.compile("Stopping( the)* server")
 
 class font:
+  """
+  The font class includes some shortcuts to format the output.
+  """
   normal    = '\033[0m'
   bold      = '\033[1m'
   underline = '\033[4m'
@@ -77,7 +85,28 @@ def process_logins(raw_data):
   """
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the number of logins for this player.
   """
-  #everything until return is garbage FIXME
+  # logins will be the dictionary which contains the number of logins for each player
+  logins = {}
+  # raw data is a list of strings, each string is one logfile
+  for logfile in raw_data:
+    # split logfile into a list of lines
+    lines = logfile.split('\n')
+    for line in lines:
+      search_result = re.search(regex.login, line)
+      if search_result:
+        search_result = search_result.group(1)
+        # now search result contains just the name of the user login in
+        if search_result in logins:
+          logins[search_result] = logins[search_result] + 1
+        else:
+          logins[search_result] = 1
+  return logins
+#  return {'herobrine': 42}
+
+def test_regexes(raw_data):
+  """
+  text_regexes is used to test the regexes used to find stuff in the logfiles. Atm this uses a logfile that is not included in the repo, maybe at some point another logfile for testing will be included. (-;
+  """
   raw = copy.deepcopy(raw_data)
   raw = raw[0].split('\n')
   date = re.search(regex.date, raw[0])
@@ -102,9 +131,7 @@ def process_logins(raw_data):
   serverstop = re.search(regex.stop, raw[58])
   if serverstop:
     print 'serverstop 2', True
-
-  return {'herobrine': 42}
-
+  return
 
 def print_help():
   """
@@ -117,7 +144,7 @@ def print_help():
   print font.bold + '\t --online-time' + font.normal
   print '\t\tCalculate the overall time each player has been online.', font.bold + font.red + 'not yet implemented' + font.normal
   print font.bold + '\t --logins' + font.normal
-  print '\t\tGive the number of times each player has logged in.', font.bold + font.red + 'not yet implemented' + font.normal
+  print '\t\tGive the number of times each player has logged in.'
   print font.bold + '\t --deaths' + font.normal
   print '\t\tGive the number of deaths for each player.', font.bold + font.red + 'not yet implemented' + font.normal
 
@@ -155,6 +182,11 @@ def main():
     write = True
     del args[args.index('--write')]
 
+  # this is just to test the regexes against a logfile
+  if '--test' in args:
+    test_regexes(read_logfiles(['test.log']))
+    exit(0)
+
   if not args:
     print font.red + 'no files given\n' + font.normal
     print_help()
@@ -167,6 +199,7 @@ def main():
 
   if logins:
     login_result = process_logins(raw_data)
+    print login_result
 
 
 # standard boilerplate
