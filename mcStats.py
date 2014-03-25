@@ -112,37 +112,41 @@ def test_regexes():
   """
   logfile = read_logfiles(['test.log'])[0].split('\n')
   # FIXME make loops and got through the file, break once one is found
+  print 'testing time regex'
   for line in logfile:
     time = re.search(regex.time, line)
     if time:
-      print 'time:', time.group(1), time.group(2), time.group(3)
-
+      print '\ttime:', time.group(1), time.group(2), time.group(3)
+      break
+  print 'testing login regex'
   for line in logfile:
     user = re.search(regex.login, line)
     if user:
-      print 'login:', user.group(1)
+      print '\tlogin:', user.group(1)
       break
+  print 'testing logout regex'
   for line in logfile:
     user = re.search(regex.logout, line)
     if user:
-      print 'logout:', user.group(1)
+      print '\tlogout:', user.group(1)
       break
+  print 'testing kick regex'
   for line in logfile:
     user = re.search(regex.kick, line)
     if user:
-      print 'kick:', user.group(1)
+      print '\tkick:', user.group(1)
       break
+  print 'testing connection lost regex'
   for line in logfile:
     user = re.search(regex.con_lost, line)
     if user:
-      print 'lost connection:', user.group(1)
+      print '\tlost connection:', user.group(1)
       break
+  print 'testing serverstop regex (should be two results)'
   for line in logfile:
     serverstop = re.search(regex.stop, line)
     if serverstop:
-      print 'serverstop:', True
-
-  return
+      print '\tserverstop:', True
 
 def print_help():
   """
