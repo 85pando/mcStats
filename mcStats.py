@@ -23,6 +23,9 @@ class regex:
   # this regex finds kick events
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
   kick = re.compile("Kicked (\S+) from the game")
+  # this regex finds connections losses TODO
+  # ex: [10:42:23] [Server thread/INFO]: herobrine lost conection: TextComponent...
+  con_lost = re.compile("(\S+) lost connection:")
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
@@ -111,26 +114,30 @@ def test_regexes(raw_data):
   raw = raw[0].split('\n')
   date = re.search(regex.date, raw[0])
   if date:
-    print 'date', date.group(1), date.group(2), date.group(3)
+    print 'date:', date.group(1), date.group(2), date.group(3)
 
   user = re.search(regex.login, raw[23])
   if user:
-    print 'login', user.group(1)
+    print 'login:', user.group(1)
 
   user = re.search(regex.logout, raw[31])
   if user:
-    print 'logout', user.group(1)
+    print 'logout:', user.group(1)
 
   user = re.search(regex.kick, raw[47])
   if user:
-    print 'kick', user.group(1)
+    print 'kick:', user.group(1)
+
+  user = re.search(regex.con_lost, raw[48])
+  if user:
+    print 'lost connection:', user.group(1)
 
   serverstop = re.search(regex.stop, raw[57])
   if serverstop:
-    print 'serverstop 1', True
+    print 'serverstop 1:', True
   serverstop = re.search(regex.stop, raw[58])
   if serverstop:
-    print 'serverstop 2', True
+    print 'serverstop 2:', True
   return
 
 def print_help():
