@@ -104,7 +104,6 @@ def process_logins(raw_data):
         else:
           logins[search_result] = 1
   return logins
-#  return {'herobrine': 42}
 
 def test_regexes():
   """
@@ -147,6 +146,15 @@ def test_regexes():
     serverstop = re.search(regex.stop, line)
     if serverstop:
       print '\tserverstop:', True
+
+def print_dict(dictionary, string=None, sort_key=None):
+  if string:
+    print font.bold + string + font.normal
+  if not sort_key:
+    sort_key = sorted(dictionary)
+  for name in sort_key:
+    print '\t', name + ':', dictionary[name]
+  return
 
 def print_help():
   """
@@ -214,8 +222,8 @@ def main():
 
   if logins:
     login_result = process_logins(raw_data)
-    print login_result
-
+    sorter = sorted(login_result, key=lambda x: login_result[x], reverse=True)
+    print_dict(login_result, 'Logins:', sorter)
 
 # standard boilerplate
 if __name__ == '__main__':
