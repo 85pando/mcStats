@@ -35,6 +35,11 @@ class regex:
   # this regex finds connections losses TODO
   # ex: [10:42:23] [Server thread/INFO]: herobrine lost conection: TextComponent...
   con_lost = re.compile('(\S+) lost connection:')
+  # this regex finds the start of the server
+  # ex: [17:28:14] [Server thread/INFO]: Starting minecraft server version 1.7.2
+  # ex: [17:28:15] [Server thread/INFO]: Starting Minecraft server on 192.169.0.1:25566
+  # ex: [15:35:24] [Server thread/INFO]: Starting minecraft server version 14w11a
+  start = re.compile('\[\d{2}:\d{2}:\d{2}\] \[[\w\s]+\/[A-Z]+\]: Starting [Mm]inecraft server (on \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}|version (\d+\.\d+\.\d+|\d{2}w\d{2}[a-z]*))')
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
@@ -71,7 +76,7 @@ def read_logfiles(filenames):
       # only try to add logfiles, when they exist
       logfiles.append(read_single_file(singlefile))
     else:
-      if verbose:
+      #if verbose:
         print singlefile, 'is not a file'
   return logfiles
 
@@ -119,6 +124,7 @@ def process_online_time(raw_data):
   """
   online_time= {}
   online = {}
+  last_time = None
   for logfile in raw_data:
     # logfile is the content of a single log file
     lines = logfile.split('\n')
@@ -132,6 +138,26 @@ def process_online_time(raw_data):
         print 'assuming the filename is latest or test:', lines[0]
       #file_date = 'date', datetime.datetime.now().date()
       file_date = datetime.datetime.now().date()
+    # check if the server did a clean shutdown (i.e. there are no users still online when the server starts)
+    for line in lines[1:10]:
+      search_result = re.search(regex.login, line)
+      if search_result:
+        # this is a fresh server log, no users should be online
+        if online:
+          # there are sill users online, logging them out at the last point, where the server was known to run
+          if verbose:
+            print 'unclean shutdown, parting users at last known time the server was running'
+          online_list = []
+          for user in online:
+            online_list.append(user)
+          for user in online:
+            from_time = online[user]
+            if user in online_list:
+              online_time[user] += last_time-from_time
+            else:
+              online_time[user] = last_time-from_time
+          for user in online_list:
+            del online[user]
     # lines is a list of all lines from the logfile
     for line in lines:
       search_date = re.search(regex.time, line)
@@ -142,6 +168,8 @@ def process_online_time(raw_data):
       else:
         #timestamp = file_date + ' ' + search_date.group(1)
         time = datetime.datetime.strptime(str(file_date) + " " + search_date.group(1), '%Y-%m-%d %H:%M:%S')
+        # store time in case the server does an unclean shutdown (i.e. crash)
+        last_time = time
       # search for login
       search_result = re.search(regex.login, line)
       if search_result:
@@ -265,6 +293,12 @@ def test_regexes():
     serverstop = re.search(regex.stop, line)
     if serverstop:
       print '\tserverstop:', True
+  print 'testing serverstart regex (should be five results)'
+  logfile = read_logfiles(['serverstart.log'])[0].split('\n')
+  for line in logfile:
+    serverstart = re.search(regex.start, line)
+    if serverstart:
+      print'\tserverstart:', True
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -366,7 +400,6 @@ def main():
 
   if online_time:
     online_time_result = process_online_time(raw_data)
-    print online_time_result
     sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
     print_dict(online_time_result, 'Online-Time:')
 

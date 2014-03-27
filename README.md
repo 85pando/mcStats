@@ -10,6 +10,8 @@ This programm will create statistics for your minecraft server.
 * --verbose: only print unimportant stuff if requested
 ## Usage
 
+T.b.d. Use ```./mcStats.py --help```
+
 ## TODO
 
 * textual statistics
@@ -17,6 +19,7 @@ This programm will create statistics for your minecraft server.
     * deaths (number of deaths, number if times killed by xyz)
     * uptime
     * accept folders as input
+    * find out, why some users are logged as online but come online again
 * create some visual statistics for the above
 * make nicer indenting for help
 
