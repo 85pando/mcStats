@@ -6,7 +6,7 @@ This programm will create statistics for your minecraft server.
 
 * mcStats can read log files. It does not matter, if they are plaintex (.log) or zipped (.gz). Several option included, simple help included. Most options do nothing at the moment.  )-:
 * --logins: counts the logins of each user
-
+* --verbose: only print unimportant stuff if requested
 ## Usage
 
 ## TODO
@@ -16,6 +16,7 @@ This programm will create statistics for your minecraft server.
     * online-time relative to time first online
     * deaths (number of deaths, number if times killed by xyz)
     * uptime
+    * accept folders as input
 * create some visual statistics for the above
 * make nicer indenting for help
 

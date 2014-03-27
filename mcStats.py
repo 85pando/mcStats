@@ -7,6 +7,14 @@ import gzip
 import re
 import copy
 
+# global variables (ugh)
+global verbose
+verbose = False
+def set_verbose(boolean = True):
+  global verbose
+  verbose = boolean
+  return
+
 class regex:
   """
   The regex class includes the regexes used to find certain things in the logs.
@@ -48,38 +56,55 @@ class font:
 def read_logfiles(filenames):
   """
   Give a list of valid minecraft logfiles in either gzipped (.gz) or plaintext (.log) format, read_logfiles extract the text from all logfiles as a list.
+  filenames - a list of logfiles to process
   """
+  # logfiles will include one logfile for each entry as a string
   logfiles = []
   for singlefile in filenames:
+    # singlefile will be a single logfile as string
     if os.path.exists(os.path.abspath(singlefile)):
+      # only try to add logfiles, when they exist
       logfiles.append(read_single_file(singlefile))
     else:
-      print singlefile, 'is not a file'
+      if verbose:
+        print singlefile, 'is not a file'
   return logfiles
 
 def read_single_file(filename):
   """
   Given either a .gz or .log file, read_single_file will extract the content of the file and give it back as a string.
+  filename - a single logfile
   """
+  # unpack file_name and file_extension to be able to distinguish different file types
   file_name, file_extension = os.path.splitext(filename)
   if file_extension == '.gz':
-    print 'open gzipped file', filename
+    # .gz files are zipped, open accordingly
+    if verbose:
+      print 'open gzipped file', filename
     f = gzip.open(filename, 'rU')
   else:
-    print 'open file', filename
+    # .log are plaintext files, just open
+    if verbose:
+      print 'open file', filename
     f = open(filename, 'rU')
+  # text will contain the content of filename as a string
   text = ''
   if file_extension == '.gz' or file_extension == '.log':
-    print 'processing', filename
+    # file is in one of the known formats, process
+    if verbose:
+      print 'processing', filename
     text = f.read()
   else:
-    print 'not a logfile'
+    # file is not in a known format, don't use
+    if verbose:
+      print 'not a logfile'
   f.close()
   return text
 
 def process_online_time(raw_data):
   """
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the online time for each player.
+  raw_data is a list of logfiles, each logfile is a string containing the whole file
   """
   # TODO
   return {'herobrine': (42,42,42)}
@@ -87,6 +112,7 @@ def process_online_time(raw_data):
 def process_logins(raw_data):
   """
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the number of logins for this player.
+  raw_data is a list of logfiles, each logfile is a string containing the whole file
   """
   # logins will be the dictionary which contains the number of logins for each player
   logins = {}
@@ -100,8 +126,10 @@ def process_logins(raw_data):
         search_result = search_result.group(1)
         # now search result contains just the name of the user login in
         if search_result in logins:
+          # user already in dictionary, increment
           logins[search_result] = logins[search_result] + 1
         else:
+          # user not yet in dictionary, insert
           logins[search_result] = 1
   return logins
 
@@ -150,14 +178,21 @@ def test_regexes():
 def print_dict(dictionary, string=None, sort_list=None):
   """
   print_dict prints a dictionary in a nicely readable manner. string will be printed as a header, if given. The sort_list can be used to sort the dictionary differently. By default it will be sorted naturally after the key. This can be used to sort by the value or similar.
+  dictionary - a python dictionary containing some printable stuff
+  string - print something in front of the output, if nothing is supplied 'Output:' will be used
+  sort_list - supply a list of keys for output, the output will be sorted via this list, can also be used to print only parts of the dictionary (only stuff in this list will be printed), if not supplied, keys will be sorted alphabetically
   """
   if string:
+    # print something before the dictionary
     print font.bold + string + font.normal
   else:
-    print 'Output:'
+    # just print the default
+    print font.bold + 'Output:' + font.normal
   if not sort_list:
+    # no special sorting prefrerences, do it alphabetically
     sort_list = sorted(dictionary)
   for name in sort_list:
+    # print each entry from the sorted_list
     print '\t', name + ':', dictionary[name]
   return
 
@@ -166,33 +201,43 @@ def print_help():
   print_help will display usage instructions for mcStats. It will stop the program after printing.
   """
   print 'Minecraft Statistics - Usage'
-  print font.bold + 'mcStats' + font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths]', font.bold + 'file [file ...]' + font.normal
+  print font.bold + 'mcStats' + font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', font.bold + 'file [file ...]' + font.normal
+  print font.bold + '\t--help' + font.normal
+  print '\t\tPrint the help text. If this option is given, all other options will be ignored.'
   print font.bold + '\t--write outputfile' + font.normal
   print '\t\tDon\'t write the output to stdout but to the outputfile.', font.bold + font.red + 'not yet implemented' + font.normal
-  print font.bold + '\t --online-time' + font.normal
+  print font.bold + '\t--online-time' + font.normal
   print '\t\tCalculate the overall time each player has been online.', font.bold + font.red + 'not yet implemented' + font.normal
-  print font.bold + '\t --logins' + font.normal
+  print font.bold + '\t--logins' + font.normal
   print '\t\tGive the number of times each player has logged in.'
-  print font.bold + '\t --deaths' + font.normal
+  print font.bold + '\t--deaths' + font.normal
   print '\t\tGive the number of deaths for each player.', font.bold + font.red + 'not yet implemented' + font.normal
+  print font.bold + '\t--verbose' + font.normal
+  print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
   exit(0)
 
 def main():
-  online_time = False
-  logins = False
+  # variables for flags
   deaths = False
+  logins = False
+  online_time = False
   write = False
+  # input arguments
   args = sys.argv[1:]
   if not args:
+    # no arguments supplied, print warning and help
     print font.red + font.bold + 'no files or options given\n' + font.normal
     print_help()
 
   if '-h' in args:
     print_help()
-
   if '--help' in args:
     print_help()
+
+  if '--verbose' in args:
+    set_verbose(True)
+    del args[args.index('--verbose')]
 
   if '--online-time' in args:
     online_time = True
