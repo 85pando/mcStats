@@ -6,6 +6,7 @@ import os
 import gzip
 import re
 import copy
+import datetime
 
 # global variables (ugh)
 global verbose
@@ -21,7 +22,7 @@ class regex:
   """
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  time = re.compile("\[(\d\d):(\d\d):(\d\d)\]")
+  time = re.compile("\[(\d\d:\d\d:\d\d)\]")
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
   login = re.compile("(\S+) joined the game")
@@ -104,15 +105,82 @@ def read_single_file(filename):
 def process_online_time(raw_data):
   """
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the online time for each player.
-  raw_data is a list of logfiles, each logfile is a string containing the whole file
+  raw_data - a list of logfiles, each logfile is a string containing the whole file
   """
-  # TODO
-  return {'herobrine': (42,42,42)}
+  online_time= {}
+  online = {}
+  for logfile in raw_data:
+    # logfile is the content of a single log file
+    lines = logfile.split('\n')
+    # lines is a list of all lines from the logfile
+    for line in lines:
+      search_date = re.search(regex.time, line)
+      if not search_date:
+        sys.stderr.write('line contains no date:\n\t' + line + '\n')
+        continue
+      else:
+        # FIXME date has to be included, as log files stop at end of day and continue on the next
+        time = datetime.datetime.strptime(search_date.group(1), '%H:%M:%S')
+      # search for login
+      search_result = re.search(regex.login, line)
+      if search_result:
+        user =  search_result.group(1)
+        # user logged in
+        if user in online:
+          # this should not happen
+          sys.stderr.write('user comes online although he is already online\n')
+        else:
+          # user is not online, comes online
+          online[user] = time
+      else:
+        # search for disconnects
+        for cur_reg in [regex.logout,regex.kick,regex.con_lost]:
+          # looking for any of the part messages
+          search_result = re.search(cur_reg, line)
+          if search_result:
+            #user = search_result.group(1)
+            break # we found a msg in this line
+        if search_result:
+          user = search_result.group(1)
+          # user has a part message
+          if user in online:
+            from_time = online[user]
+            del online[user]
+            # user was online, is now parting
+            if user in online_time:
+              # user has been online before
+              online_time[user] += time-from_time # join-part
+            else:
+              # this was the first time, the user was online
+              online_time[user] = time-from_time # join-part
+          else:
+            if verbose:
+              print 'redundant part message', line
+        else:
+          # we found no part message, look for server stop
+          search_result = re.search(regex.stop, line)
+          if search_result:
+            user_list = []
+            for user in online:
+              from_time = online[user]
+              user_list.append(user)
+              if user in online_time:
+                online_time[user] += time-from_time
+              else:
+                online_time[user] = time-from_time
+              print user
+            for user in user_list:
+              del online[user]
+          else:
+            if verbose:
+              print 'line contained no join/part/stop message\n\t', line
+
+  return online_time
 
 def process_logins(raw_data):
   """
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the number of logins for this player.
-  raw_data is a list of logfiles, each logfile is a string containing the whole file
+  raw_data - a list of logfiles, each logfile is a string containing the whole file
   """
   # logins will be the dictionary which contains the number of logins for each player
   logins = {}
