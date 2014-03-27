@@ -3,7 +3,6 @@
 [17:28:14] [Server thread/INFO]: Default game type: SURVIVAL
 [17:28:14] [Server thread/INFO]: Generating keypair
 [17:28:15] [Server thread/INFO]: Starting Minecraft server on 192.169.0.1:25566
-[17:28:15] [Server thread/WARN]: Failed to load operators list: java.io.FileNotFoundException: ./ops.txt (No such file or directory)
 [17:28:15] [Server thread/INFO]: Preparing level "testlog"
 [17:28:15] [Server thread/INFO]: Preparing start region for level 0
 [17:28:16] [Server thread/INFO]: Preparing spawn area: 6%
