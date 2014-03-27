@@ -54,6 +54,8 @@ class font:
   magenta   = '\033[35m'
   cyan      = '\033[36m'
 
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def read_logfiles(filenames):
   """
   Give a list of valid minecraft logfiles in either gzipped (.gz) or plaintext (.log) format, read_logfiles extract the text from all logfiles as a list.
@@ -70,6 +72,8 @@ def read_logfiles(filenames):
       if verbose:
         print singlefile, 'is not a file'
   return logfiles
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def read_single_file(filename):
   """
@@ -101,6 +105,8 @@ def read_single_file(filename):
       print 'not a logfile'
   f.close()
   return text
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def process_online_time(raw_data):
   """
@@ -138,7 +144,6 @@ def process_online_time(raw_data):
           # looking for any of the part messages
           search_result = re.search(cur_reg, line)
           if search_result:
-            #user = search_result.group(1)
             break # we found a msg in this line
         if search_result:
           user = search_result.group(1)
@@ -168,7 +173,6 @@ def process_online_time(raw_data):
                 online_time[user] += time-from_time
               else:
                 online_time[user] = time-from_time
-              print user
             for user in user_list:
               del online[user]
           else:
@@ -176,6 +180,8 @@ def process_online_time(raw_data):
               print 'line contained no join/part/stop message\n\t', line
 
   return online_time
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def process_logins(raw_data):
   """
@@ -200,6 +206,8 @@ def process_logins(raw_data):
           # user not yet in dictionary, insert
           logins[search_result] = 1
   return logins
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def test_regexes():
   """
@@ -243,6 +251,8 @@ def test_regexes():
     if serverstop:
       print '\tserverstop:', True
 
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def print_dict(dictionary, string=None, sort_list=None):
   """
   print_dict prints a dictionary in a nicely readable manner. string will be printed as a header, if given. The sort_list can be used to sort the dictionary differently. By default it will be sorted naturally after the key. This can be used to sort by the value or similar.
@@ -264,6 +274,8 @@ def print_dict(dictionary, string=None, sort_list=None):
     print '\t', name + ':', dictionary[name]
   return
 
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def print_help():
   """
   print_help will display usage instructions for mcStats. It will stop the program after printing.
@@ -284,6 +296,8 @@ def print_help():
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
   exit(0)
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def main():
   # variables for flags
@@ -337,6 +351,7 @@ def main():
 
   if online_time:
     online_time_result = process_online_time(raw_data)
+    print_dict(online_time_result)
 
   if logins:
     login_result = process_logins(raw_data)
