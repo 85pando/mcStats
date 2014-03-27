@@ -22,23 +22,25 @@ class regex:
   """
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  time = re.compile("\[(\d\d:\d\d:\d\d)\]")
+  time = re.compile('\[(\d\d:\d\d:\d\d)\]')
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
-  login = re.compile("(\S+) joined the game")
+  login = re.compile('(\S+) joined the game')
   # this regex finds a logout
   # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
-  logout = re.compile("(\S+) left the game")
+  logout = re.compile('(\S+) left the game')
   # this regex finds kick events
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
-  kick = re.compile("Kicked (\S+) from the game")
+  kick = re.compile('Kicked (\S+) from the game')
   # this regex finds connections losses TODO
   # ex: [10:42:23] [Server thread/INFO]: herobrine lost conection: TextComponent...
-  con_lost = re.compile("(\S+) lost connection:")
+  con_lost = re.compile('(\S+) lost connection:')
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
-  stop = re.compile("Stopping( the)* server")
+  stop = re.compile('Stopping( the)* server')
+  # this regex is used to extract the date from the filename
+  file_date = re.compile('(\d{4}-\d{2}-\d{2})')
 
 class font:
   """
@@ -98,7 +100,9 @@ def read_single_file(filename):
     # file is in one of the known formats, process
     if verbose:
       print 'processing', filename
-    text = f.read()
+    # include filename into text, s.t. date can be extracted if needed
+    text = 'date: ' + file_name + '\n'
+    text += f.read()
   else:
     # file is not in a known format, don't use
     if verbose:
@@ -118,15 +122,26 @@ def process_online_time(raw_data):
   for logfile in raw_data:
     # logfile is the content of a single log file
     lines = logfile.split('\n')
+    # extract date from file
+    file_date = re.search(regex.file_date, lines[0])
+    if file_date:
+      file_date =  file_date.group()
+    else:
+      # if the regex is not found in the first line, it is assumed to be latest.log or test.log
+      if verbose:
+        print 'assuming the filename is latest or test:', lines[0]
+      #file_date = 'date', datetime.datetime.now().date()
+      file_date = datetime.datetime.now().date()
     # lines is a list of all lines from the logfile
     for line in lines:
       search_date = re.search(regex.time, line)
       if not search_date:
-        sys.stderr.write('line contains no date:\n\t' + line + '\n')
+        if verbose:
+          sys.stderr.write('line contains no date:\n\t' + line + '\n')
         continue
       else:
-        # FIXME date has to be included, as log files stop at end of day and continue on the next
-        time = datetime.datetime.strptime(search_date.group(1), '%H:%M:%S')
+        #timestamp = file_date + ' ' + search_date.group(1)
+        time = datetime.datetime.strptime(str(file_date) + " " + search_date.group(1), '%Y-%m-%d %H:%M:%S')
       # search for login
       search_result = re.search(regex.login, line)
       if search_result:
@@ -219,7 +234,7 @@ def test_regexes():
   for line in logfile:
     time = re.search(regex.time, line)
     if time:
-      print '\ttime:', time.group(1), time.group(2), time.group(3)
+      print '\ttime:', time.group(1)
       break
   print 'testing login regex'
   for line in logfile:
@@ -287,7 +302,7 @@ def print_help():
   print font.bold + '\t--write outputfile' + font.normal
   print '\t\tDon\'t write the output to stdout but to the outputfile.', font.bold + font.red + 'not yet implemented' + font.normal
   print font.bold + '\t--online-time' + font.normal
-  print '\t\tCalculate the overall time each player has been online.', font.bold + font.red + 'not yet implemented' + font.normal
+  print '\t\tCalculate the overall time each player has been online.'
   print font.bold + '\t--logins' + font.normal
   print '\t\tGive the number of times each player has logged in.'
   print font.bold + '\t--deaths' + font.normal
@@ -351,7 +366,9 @@ def main():
 
   if online_time:
     online_time_result = process_online_time(raw_data)
-    print_dict(online_time_result)
+    print online_time_result
+    sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
+    print_dict(online_time_result, 'Online-Time:')
 
   if logins:
     login_result = process_logins(raw_data)
