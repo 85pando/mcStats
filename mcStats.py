@@ -28,25 +28,25 @@ class Regex:
 
   # this regex finds chat messages
   # ex: [17:42:42] [Server thread/INFO]: <herobrine> I really like this game.
-  # TODO
+  chat = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: \* (\S+)')
   # this regex finds connections losses
   # ex: [10:42:23] [Server thread/INFO]: herobrine lost connection: TextComponent...
-  con_lost = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) lost connection:')
+  con_lost = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+) lost connection:')
   # this regex finds emotes
   # ex: [17:42:23] [Server thread/INFO]: * herobrine nice game
-  # TODO
+  emote = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: <(\S+)>')
   # this regex is used to extract the date from the filename
   # ex: 2014-28-03
   file_date = re.compile(r'(\d{4}-\d{2}-\d{2})')
   # this regex finds kick events
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
-  kick = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: Kicked (\S+) from the game')
+  kick = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: Kicked (\S+) from the game')
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
-  login = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) joined the game')
+  login = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+) joined the game')
   # this regex finds a logout
   # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
-  logout = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) left the game')
+  logout = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+) left the game')
   # this regex finds the user name of a line where a user does something
   # ex: [23:42:00] [Server thread/INFO]: herobrine drowned
   name = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+)')
@@ -58,7 +58,7 @@ class Regex:
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
-  stop = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: Stopping( the)* server')
+  stop = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: Stopping( the)* server')
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
   time = re.compile(r'^\[(\d{2}:\d{2}:\d{2})\]')
@@ -334,41 +334,55 @@ def test_regexes():
   text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every Regex.
   """
   logfile = read_logfiles(['test.log'])[0].split('\n')
+  print 'testing chat regex'
+  for line in logfile:
+    user = re.search(Regex.chat, line)
+    if user:
+      print '\tchat', user.group(1) + '\n\t' + line
+  print 'testing emote regex'
+  for line in logfile:
+    user = re.search(Regex.emote, line)
+    if user:
+      print '\temote', user.group(1) + '\n\t' + line
   print 'testing time regex'
   for line in logfile:
     time = re.search(Regex.time, line)
     if time:
-      print '\ttime:', time.group(1)
+      print '\ttime:', time.group(1) + '\n\t' + line
       break
   print 'testing login regex'
   for line in logfile:
     user = re.search(Regex.login, line)
     if user:
-      print '\tlogin:', user.group(1)
+      print '\tlogin:', user.group(1) + '\n\t' + line
+
       break
   print 'testing logout regex'
   for line in logfile:
     user = re.search(Regex.logout, line)
     if user:
-      print '\tlogout:', user.group(1)
+      print '\tlogout:', user.group(1) + '\n\t' + line
+
       break
   print 'testing kick regex'
   for line in logfile:
     user = re.search(Regex.kick, line)
     if user:
-      print '\tkick:', user.group(1)
+      print '\tkick:', user.group(1) + '\n\t' + line
+
       break
   print 'testing connection lost regex'
   for line in logfile:
     user = re.search(Regex.con_lost, line)
     if user:
-      print '\tlost connection:', user.group(1)
+      print '\tlost connection:', user.group(1) + '\n\t' + line
+
       break
   print 'testing name regex'
   for line in logfile:
     user = re.search(Regex.name, line)
     if user:
-      print '\tname'
+      print '\tname', user.group(1)
       break
   print 'testing serverstop regex (should be two results)'
   for line in logfile:
