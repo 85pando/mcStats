@@ -19,6 +19,8 @@
 [17:36:51] [User Authenticator #2/INFO]: UUID of player herobrine is 42424242
 [17:36:51] [Server thread/INFO]: herobrine[/192.169.0.2:49710] logged in with entity id 44972 at (-212.01158965192414, 192.0, 249.1278095684763)
 [17:36:51] [Server thread/INFO]: herobrine joined the game
+[17:42:23] [Server thread/INFO]: * herobrine nice game
+[17:42:42] [Server thread/INFO]: <herobrine> I really like this game.
 [17:53:28] [Server thread/INFO]: Kicked herobrine from the game: 'cause I can'
 [17:53:28] [Server thread/INFO]: herobrine lost connection: TextComponent{text='cause I can', siblings=[], style=Style{hasParent=false, color=null, bold=null, italic=null, underlined=null, obfuscated=null, clickEvent=null, hoverEvent=null}}
 [17:53:28] [Server thread/INFO]: herobrine left the game

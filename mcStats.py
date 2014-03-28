@@ -31,7 +31,7 @@ class Regex:
   # TODO
   # this regex finds connections losses
   # ex: [10:42:23] [Server thread/INFO]: herobrine lost connection: TextComponent...
-  con_lost = re.compile(r'(\S+) lost connection:')
+  con_lost = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) lost connection:')
   # this regex finds emotes
   # ex: [17:42:23] [Server thread/INFO]: * herobrine nice game
   # TODO
@@ -40,13 +40,13 @@ class Regex:
   file_date = re.compile(r'(\d{4}-\d{2}-\d{2})')
   # this regex finds kick events
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
-  kick = re.compile(r'Kicked (\S+) from the game')
+  kick = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: Kicked (\S+) from the game')
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
-  login = re.compile(r'(\S+) joined the game')
+  login = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) joined the game')
   # this regex finds a logout
   # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
-  logout = re.compile(r'(\S+) left the game')
+  logout = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (\S+) left the game')
   # this regex finds the user name of a line where a user does something
   # ex: [23:42:00] [Server thread/INFO]: herobrine drowned
   name = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+)')
@@ -58,10 +58,10 @@ class Regex:
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
-  stop = re.compile(r'Stopping( the)* server')
+  stop = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: Stopping( the)* server')
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  time = re.compile(r'\[(\d{2}:\d{2}:\d{2})\]')
+  time = re.compile(r'^\[(\d{2}:\d{2}:\d{2})\]')
 
 
 
@@ -424,7 +424,7 @@ def print_help():
   print Font.bold + '\t--logins' + Font.normal
   print '\t\tGive the number of times each player has logged in.'
   print Font.bold + '\t--deaths' + Font.normal
-  print '\t\tGive the number of deaths for each player.', Font.bold + Font.red + 'not yet implemented' + Font.normal
+  print '\t\tGive the number of deaths for each player.'
   print Font.bold + '\t--verbose' + Font.normal
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
