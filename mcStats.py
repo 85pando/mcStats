@@ -5,21 +5,27 @@ import sys
 import os
 import gzip
 import re
-import copy
+#import copy
 import datetime
 
 # global variables (ugh)
 global verbose
 verbose = False
-def set_verbose(boolean = True):
+
+
+def set_verbose(boolean=True):
   global verbose
   verbose = boolean
   return
 
-class regex:
+
+class Regex:
   """
-  The regex class includes the regexes used to find certain things in the logs.
+  The Regex class includes the regexes used to find certain things in the logs.
   """
+  def __init__(self):
+    pass
+
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
   time = re.compile('\[(\d{2}:\d{2}:\d{2})\]')
@@ -33,13 +39,14 @@ class regex:
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
   kick = re.compile('Kicked (\S+) from the game')
   # this regex finds connections losses TODO
-  # ex: [10:42:23] [Server thread/INFO]: herobrine lost conection: TextComponent...
+  # ex: [10:42:23] [Server thread/INFO]: herobrine lost connection: TextComponent...
   con_lost = re.compile('(\S+) lost connection:')
   # this regex finds the start of the server
   # ex: [17:28:14] [Server thread/INFO]: Starting minecraft server version 1.7.2
   # ex: [17:28:15] [Server thread/INFO]: Starting Minecraft server on 192.169.0.1:25566
   # ex: [15:35:24] [Server thread/INFO]: Starting minecraft server version 14w11a
-  start = re.compile('\[\d{2}:\d{2}:\d{2}\] \[[\w\s]+\/[A-Z]+\]: Starting [Mm]inecraft server (on \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}|version (\d+\.\d+\.\d+|\d{2}w\d{2}[a-z]*))')
+  start = re.compile(
+    '\[\d{2}:\d{2}:\d{2}\] \[[\w\s]+/[A-Z]+\]: Starting [Mm]inecraft server (on \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}|version (\d+\.\d+\.\d+|\d{2}w\d{2}[a-z]*))')
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
@@ -47,19 +54,25 @@ class regex:
   # this regex is used to extract the date from the filename
   file_date = re.compile('(\d{4}-\d{2}-\d{2})')
 
-class font:
+
+class Font:
   """
-  The font class includes some shortcuts to format the output.
+  The Font class includes some shortcuts to format the output.
   """
-  normal    = '\033[0m'
-  bold      = '\033[1m'
+
+  def __init__(self):
+    pass
+
+  normal = '\033[0m'
+  bold = '\033[1m'
   underline = '\033[4m'
-  red       = '\033[31m'
-  blue      = '\033[34m'
-  yellow    = '\033[33m'
-  green     = '\033[32m'
-  magenta   = '\033[35m'
-  cyan      = '\033[36m'
+  red = '\033[31m'
+  blue = '\033[34m'
+  yellow = '\033[33m'
+  green = '\033[32m'
+  magenta = '\033[35m'
+  cyan = '\033[36m'
+
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -77,8 +90,9 @@ def read_logfiles(filenames):
       logfiles.append(read_single_file(singlefile))
     else:
       #if verbose:
-        print singlefile, 'is not a file'
+      print singlefile, 'is not a file'
   return logfiles
+
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -115,6 +129,7 @@ def read_single_file(filename):
   f.close()
   return text
 
+
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def process_online_time(raw_data):
@@ -122,16 +137,16 @@ def process_online_time(raw_data):
   Given a list of the content of valid minecraft logfiles, process_online_time will calculate the online time for each player.
   raw_data - a list of logfiles, each logfile is a string containing the whole file
   """
-  online_time= {}
+  online_time = {}
   online = {}
   last_time = None
   for logfile in raw_data:
     # logfile is the content of a single log file
     lines = logfile.split('\n')
     # extract date from file
-    file_date = re.search(regex.file_date, lines[0])
+    file_date = re.search(Regex.file_date, lines[0])
     if file_date:
-      file_date =  file_date.group()
+      file_date = file_date.group()
     else:
       # if the regex is not found in the first line, it is assumed to be latest.log or test.log
       if verbose:
@@ -140,7 +155,7 @@ def process_online_time(raw_data):
       file_date = datetime.datetime.now().date()
     # check if the server did a clean shutdown (i.e. there are no users still online when the server starts)
     for line in lines[1:10]:
-      search_result = re.search(regex.login, line)
+      search_result = re.search(Regex.login, line)
       if search_result:
         # this is a fresh server log, no users should be online
         if online:
@@ -153,14 +168,14 @@ def process_online_time(raw_data):
           for user in online:
             from_time = online[user]
             if user in online_list:
-              online_time[user] += last_time-from_time
+              online_time[user] += last_time - from_time
             else:
-              online_time[user] = last_time-from_time
+              online_time[user] = last_time - from_time
           for user in online_list:
             del online[user]
     # lines is a list of all lines from the logfile
     for line in lines:
-      search_date = re.search(regex.time, line)
+      search_date = re.search(Regex.time, line)
       if not search_date:
         if verbose:
           sys.stderr.write('line contains no date:\n\t' + line + '\n')
@@ -171,9 +186,9 @@ def process_online_time(raw_data):
         # store time in case the server does an unclean shutdown (i.e. crash)
         last_time = time
       # search for login
-      search_result = re.search(regex.login, line)
+      search_result = re.search(Regex.login, line)
       if search_result:
-        user =  search_result.group(1)
+        user = search_result.group(1)
         # user logged in
         if user in online:
           # this should not happen
@@ -183,11 +198,11 @@ def process_online_time(raw_data):
           online[user] = time
       else:
         # search for disconnects
-        for cur_reg in [regex.logout,regex.kick,regex.con_lost]:
+        for cur_reg in [Regex.logout, Regex.kick, Regex.con_lost]:
           # looking for any of the part messages
           search_result = re.search(cur_reg, line)
           if search_result:
-            break # we found a msg in this line
+            break  # we found a msg in this line
         if search_result:
           user = search_result.group(1)
           # user has a part message
@@ -197,25 +212,25 @@ def process_online_time(raw_data):
             # user was online, is now parting
             if user in online_time:
               # user has been online before
-              online_time[user] += time-from_time # join-part
+              online_time[user] += time - from_time  # join-part
             else:
               # this was the first time, the user was online
-              online_time[user] = time-from_time # join-part
+              online_time[user] = time - from_time  # join-part
           else:
             if verbose:
               print 'redundant part message', line
         else:
           # we found no part message, look for server stop
-          search_result = re.search(regex.stop, line)
+          search_result = re.search(Regex.stop, line)
           if search_result:
             user_list = []
             for user in online:
               from_time = online[user]
               user_list.append(user)
               if user in online_time:
-                online_time[user] += time-from_time
+                online_time[user] += time - from_time
               else:
-                online_time[user] = time-from_time
+                online_time[user] = time - from_time
             for user in user_list:
               del online[user]
           else:
@@ -223,6 +238,7 @@ def process_online_time(raw_data):
               print 'line contained no join/part/stop message\n\t', line
 
   return online_time
+
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -238,67 +254,69 @@ def process_logins(raw_data):
     # split logfile into a list of lines
     lines = logfile.split('\n')
     for line in lines:
-      search_result = re.search(regex.login, line)
+      search_result = re.search(Regex.login, line)
       if search_result:
         search_result = search_result.group(1)
         # now search result contains just the name of the user login in
         if search_result in logins:
           # user already in dictionary, increment
-          logins[search_result] = logins[search_result] + 1
+          logins[search_result] += 1
         else:
           # user not yet in dictionary, insert
           logins[search_result] = 1
   return logins
 
+
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def test_regexes():
   """
-  text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every regex.
+  text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every Regex.
   """
   logfile = read_logfiles(['test.log'])[0].split('\n')
   # FIXME make loops and got through the file, break once one is found
   print 'testing time regex'
   for line in logfile:
-    time = re.search(regex.time, line)
+    time = re.search(Regex.time, line)
     if time:
       print '\ttime:', time.group(1)
       break
   print 'testing login regex'
   for line in logfile:
-    user = re.search(regex.login, line)
+    user = re.search(Regex.login, line)
     if user:
       print '\tlogin:', user.group(1)
       break
   print 'testing logout regex'
   for line in logfile:
-    user = re.search(regex.logout, line)
+    user = re.search(Regex.logout, line)
     if user:
       print '\tlogout:', user.group(1)
       break
   print 'testing kick regex'
   for line in logfile:
-    user = re.search(regex.kick, line)
+    user = re.search(Regex.kick, line)
     if user:
       print '\tkick:', user.group(1)
       break
   print 'testing connection lost regex'
   for line in logfile:
-    user = re.search(regex.con_lost, line)
+    user = re.search(Regex.con_lost, line)
     if user:
       print '\tlost connection:', user.group(1)
       break
   print 'testing serverstop regex (should be two results)'
   for line in logfile:
-    serverstop = re.search(regex.stop, line)
+    serverstop = re.search(Regex.stop, line)
     if serverstop:
       print '\tserverstop:', True
   print 'testing serverstart regex (should be five results)'
   logfile = read_logfiles(['serverstart.log'])[0].split('\n')
   for line in logfile:
-    serverstart = re.search(regex.start, line)
+    serverstart = re.search(Regex.start, line)
     if serverstart:
       print'\tserverstart:', True
+
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -311,10 +329,10 @@ def print_dict(dictionary, string=None, sort_list=None):
   """
   if string:
     # print something before the dictionary
-    print font.bold + string + font.normal
+    print Font.bold + string + Font.normal
   else:
     # just print the default
-    print font.bold + 'Output:' + font.normal
+    print Font.bold + 'Output:' + Font.normal
   if not sort_list:
     # no special sorting prefrerences, do it alphabetically
     sort_list = sorted(dictionary)
@@ -323,6 +341,7 @@ def print_dict(dictionary, string=None, sort_list=None):
     print '\t', name + ':', dictionary[name]
   return
 
+
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def print_help():
@@ -330,21 +349,22 @@ def print_help():
   print_help will display usage instructions for mcStats. It will stop the program after printing.
   """
   print 'Minecraft Statistics - Usage'
-  print font.bold + 'mcStats' + font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', font.bold + 'file [file ...]' + font.normal
-  print font.bold + '\t--help' + font.normal
+  print Font.bold + 'mcStats' + Font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', Font.bold + 'file [file ...]' + Font.normal
+  print Font.bold + '\t--help' + Font.normal
   print '\t\tPrint the help text. If this option is given, all other options will be ignored.'
-  print font.bold + '\t--write outputfile' + font.normal
-  print '\t\tDon\'t write the output to stdout but to the outputfile.', font.bold + font.red + 'not yet implemented' + font.normal
-  print font.bold + '\t--online-time' + font.normal
+  print Font.bold + '\t--write outputfile' + Font.normal
+  print '\t\tDon\'t write the output to stdout but to the outputfile.', Font.bold + Font.red + 'not yet implemented' + Font.normal
+  print Font.bold + '\t--online-time' + Font.normal
   print '\t\tCalculate the overall time each player has been online.'
-  print font.bold + '\t--logins' + font.normal
+  print Font.bold + '\t--logins' + Font.normal
   print '\t\tGive the number of times each player has logged in.'
-  print font.bold + '\t--deaths' + font.normal
-  print '\t\tGive the number of deaths for each player.', font.bold + font.red + 'not yet implemented' + font.normal
-  print font.bold + '\t--verbose' + font.normal
+  print Font.bold + '\t--deaths' + Font.normal
+  print '\t\tGive the number of deaths for each player.', Font.bold + Font.red + 'not yet implemented' + Font.normal
+  print Font.bold + '\t--verbose' + Font.normal
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
-  exit(0)
+  exit(1)
+
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -358,7 +378,7 @@ def main():
   args = sys.argv[1:]
   if not args:
     # no arguments supplied, print warning and help
-    print font.red + font.bold + 'no files or options given\n' + font.normal
+    print Font.red + Font.bold + 'no files or options given\n' + Font.normal
     print_help()
 
   if '-h' in args:
@@ -392,7 +412,7 @@ def main():
     exit(0)
 
   if not args:
-    print font.red + 'no files given\n' + font.normal
+    print Font.red + 'no files given\n' + Font.normal
     print_help()
 
   filenames = args
@@ -400,7 +420,7 @@ def main():
 
   if online_time:
     online_time_result = process_online_time(raw_data)
-    sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
+    #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
     print_dict(online_time_result, 'Online-Time:')
 
   if logins:
@@ -410,4 +430,4 @@ def main():
 
 # standard boilerplate
 if __name__ == '__main__':
-    main()
+  main()
