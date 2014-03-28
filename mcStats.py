@@ -26,33 +26,43 @@ class Regex:
   def __init__(self):
     pass
 
-  # this regex is supposed to find the date
-  # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  time = re.compile('\[(\d{2}:\d{2}:\d{2})\]')
-  # this regex finds a login
-  # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
-  login = re.compile('(\S+) joined the game')
-  # this regex finds a logout
-  # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
-  logout = re.compile('(\S+) left the game')
+  # this regex finds chat messages
+  # ex: [17:42:42] [Server thread/INFO]: <herobrine> I really like this game.
+  # TODO
+  # this regex finds connections losses
+  # ex: [10:42:23] [Server thread/INFO]: herobrine lost connection: TextComponent...
+  con_lost = re.compile(r'(\S+) lost connection:')
+  # this regex finds emotes
+  # ex: [17:42:23] [Server thread/INFO]: * herobrine nice game
+  # TODO
+  # this regex is used to extract the date from the filename
+  # ex: 2014-28-03
+  file_date = re.compile(r'(\d{4}-\d{2}-\d{2})')
   # this regex finds kick events
   # ex: [10:42:23] [Server thread/INFO]: Kicked herobrine from the game: 'herobrine is not wanted'
-  kick = re.compile('Kicked (\S+) from the game')
-  # this regex finds connections losses TODO
-  # ex: [10:42:23] [Server thread/INFO]: herobrine lost connection: TextComponent...
-  con_lost = re.compile('(\S+) lost connection:')
+  kick = re.compile(r'Kicked (\S+) from the game')
+  # this regex finds a login
+  # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
+  login = re.compile(r'(\S+) joined the game')
+  # this regex finds a logout
+  # ex: [10:42:23] [Server thread/INFO]: herobrine left the game
+  logout = re.compile(r'(\S+) left the game')
+  # this regex finds the user name of a line where a user does something
+  # ex: [23:42:00] [Server thread/INFO]: herobrine drowned
+  name = re.compile(r'^\[\d{2}:\d{2}:\d{2}\] \[Server thread/INFO\]: (\S+)')
   # this regex finds the start of the server
   # ex: [17:28:14] [Server thread/INFO]: Starting minecraft server version 1.7.2
   # ex: [17:28:15] [Server thread/INFO]: Starting Minecraft server on 192.169.0.1:25566
   # ex: [15:35:24] [Server thread/INFO]: Starting minecraft server version 14w11a
-  start = re.compile(
-    '\[\d{2}:\d{2}:\d{2}\] \[[\w\s]+/[A-Z]+\]: Starting [Mm]inecraft server (on \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}|version (\d+\.\d+\.\d+|\d{2}w\d{2}[a-z]*))')
+  start = re.compile(r'\[\d{2}:\d{2}:\d{2}\] \[[\w\s]+/[A-Z]+\]: Starting [Mm]inecraft server (on \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}|version (\d+\.\d+\.\d+|\d{2}w\d{2}[a-z]*))')
   # this regex finds a server stop
   # ex: [10:42:23] [Server thread/INFO]: Stopping the server
   # ex: [10:42:23] [Server thread/INFO]: Stopping server
-  stop = re.compile('Stopping( the)* server')
-  # this regex is used to extract the date from the filename
-  file_date = re.compile('(\d{4}-\d{2}-\d{2})')
+  stop = re.compile(r'Stopping( the)* server')
+  # this regex is supposed to find the date
+  # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
+  time = re.compile(r'\[(\d{2}:\d{2}:\d{2})\]')
+
 
 
 class Font:
@@ -249,7 +259,7 @@ def process_logins(raw_data):
   """
   # logins will be the dictionary which contains the number of logins for each player
   logins = {}
-  # raw data is a list of strings, each string is one logfile
+  # raw_data is a list of strings, each string is one logfile
   for logfile in raw_data:
     # split logfile into a list of lines
     lines = logfile.split('\n')
@@ -269,12 +279,61 @@ def process_logins(raw_data):
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
+def process_deaths(raw_data):
+  """
+  Given a list of the content of valid minecraft logfiles, process_deaths will calculate the number of deaths for
+  each user
+  player.
+  raw_data - a list of logfiles, each logfile is a string containing the whole file
+  """
+  # deaths will be the dictionary which contains the number of deaths
+  deaths = {}
+  # read list of possible death causes
+  deathlist_file = open('deathlist', 'r')
+  deathlist = deathlist_file.read().split('\n')
+  deathlist_file.close()
+  # raw_data is a list of strings, each string is one logfile
+  for logfile in raw_data:
+    # split logfile into a list of lines
+    lines = logfile.split('\n')
+    #don't need first line, as this will only contain the death
+    for line in lines:
+      death_found = False
+      # lines may contain empty strings
+      for deathline in deathlist:
+        if not deathline:
+          continue
+        if deathline in line:
+          # we have found a line where a death has taken place
+          death_found = True
+          break
+      if death_found:
+        # extract name of user
+        search_result = re.search(Regex.name, line)
+        if search_result:
+          user = search_result.group(1)
+          if '*' in user:
+            print lines[0]
+            print line
+          if user in deaths:
+            # user has already died once
+            deaths[user] += 1
+          else:
+            # user never died before
+            deaths[user] = 1
+        else:
+          sys.stderr.write('found a line with a death, but no username\n\t' + line + '\n')
+  return deaths
+
+
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def test_regexes():
   """
   text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every Regex.
   """
   logfile = read_logfiles(['test.log'])[0].split('\n')
-  # FIXME make loops and got through the file, break once one is found
   print 'testing time regex'
   for line in logfile:
     time = re.search(Regex.time, line)
@@ -304,6 +363,12 @@ def test_regexes():
     user = re.search(Regex.con_lost, line)
     if user:
       print '\tlost connection:', user.group(1)
+      break
+  print 'testing name regex'
+  for line in logfile:
+    user = re.search(Regex.name, line)
+    if user:
+      print '\tname'
       break
   print 'testing serverstop regex (should be two results)'
   for line in logfile:
@@ -420,6 +485,7 @@ def main():
 
   if online_time:
     online_time_result = process_online_time(raw_data)
+    # TODO sort results by online time
     #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
     print_dict(online_time_result, 'Online-Time:')
 
@@ -427,6 +493,11 @@ def main():
     login_result = process_logins(raw_data)
     sorter = sorted(login_result, key=lambda x: login_result[x], reverse=True)
     print_dict(login_result, 'Logins:', sorter)
+
+  if deaths:
+    death_result = process_deaths(raw_data)
+    sorter = sorted(death_result, key=lambda x: death_result[x], reverse=True)
+    print_dict(death_result, 'Deaths:', sorter)
 
 # standard boilerplate
 if __name__ == '__main__':

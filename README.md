@@ -28,3 +28,7 @@ T.b.d. Use ```./mcStats.py --help```
 ## other log formats
 
 The log format mcStats uses is the one produced by the multi-threaded server. The single-threaded server used priorly has a different format. Until now I did not include this older format, but may do so at some point.
+
+## about runtime
+
+I am aware that several of the functions could be made much more efficient. Maybe Later...
