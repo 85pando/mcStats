@@ -7,7 +7,8 @@ This programm will create statistics for your minecraft server.
 * mcStats can read log files. It does not matter, if they are plaintex (.log) or zipped (.gz). Several option included, simple help included. Most options do nothing at the moment.  )-:
 * --logins: counts the logins of each user
 * --online-time: calculates the time each user was online
-* --verbose: only print unimportant stuff if requested
+* --verbose: print unimportant stuff only if requested
+
 ## Usage
 
 T.b.d. Use ```./mcStats.py --help```
@@ -15,6 +16,7 @@ T.b.d. Use ```./mcStats.py --help```
 ## TODO
 
 * textual statistics
+    * sort online-time by online-time
     * online-time relative to time first online
     * deaths (number of deaths, number if times killed by xyz)
     * uptime
@@ -25,4 +27,4 @@ T.b.d. Use ```./mcStats.py --help```
 
 ## other log formats
 
-There are older log formats, that are not yet supported by mcStats. Either I find some older logfiles or someone sends me some, so I can built regexes for them.
+The log format mcStats uses is the one produced by the multi-threaded server. The single-threaded server used priorly has a different format. Until now I did not include this older format, but may do so at some point.

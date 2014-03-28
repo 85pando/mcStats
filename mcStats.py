@@ -22,7 +22,7 @@ class regex:
   """
   # this regex is supposed to find the date
   # ex: [10:42:23] [<thread>/<INFO|WARN|...>]: <message>
-  time = re.compile('\[(\d\d:\d\d:\d\d)\]')
+  time = re.compile('\[(\d{2}:\d{2}:\d{2})\]')
   # this regex finds a login
   # ex: [10:42:23] [Server thread/INFO]: herobrine joined the game
   login = re.compile('(\S+) joined the game')
@@ -177,7 +177,7 @@ def process_online_time(raw_data):
         # user logged in
         if user in online:
           # this should not happen
-          sys.stderr.write('user comes online although he is already online\n')
+          sys.stderr.write('user comes online although he is already online\n\t' + file_date + ':\n\t' + line + '\n')
         else:
           # user is not online, comes online
           online[user] = time
