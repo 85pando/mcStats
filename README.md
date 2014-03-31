@@ -5,10 +5,11 @@ This programm will create statistics for your minecraft server.
 ## Features
 
 * mcStats can read log files. It does not matter, if they are plaintex (.log) or zipped (.gz). Several option included, simple help included. Most options do nothing at the moment.  )-:
-* --logins: counts the logins of each user
-* --online-time: calculates the time each user was online
-* --verbose: print unimportant stuff only if requested
-* --chat: calculate the number of times each player has used chat or emotes.
+* ```--logins```: counts the logins of each user
+* ```--online-time```: calculates the time each user was online
+* ```--verbose```: print unimportant stuff only if requested
+* ```--chat```: calculate the number of times each player has used chat or emotes.
+* ```--write outfile```: don't write the output to stdout but into outfile as a simple html file.
 
 ## Usage
 
@@ -35,11 +36,18 @@ T.b.d. Use ```python mcStats.py --help```
     * find out, why some users are logged as online but come online again
 * create some visual statistics for the above
 * make nicer indenting for help
+* include old one-logfile format
 
 ## other log formats
 
 The log format mcStats uses is the one produced by the multi-threaded server. The single-threaded server used priorly has a different format. Until now I did not include this older format, but may do so at some point.
 
+Until then there is the [Minecraft Log Parser][1] which can calculate the online-time for this older log format
+
 ## about runtime
 
 I am aware that several of the functions could be made much more efficient. Maybe Later...
+
+
+
+[1]: https://github.com/stevenleeg/Minecraft-Log-Parser

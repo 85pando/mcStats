@@ -510,6 +510,19 @@ def print_dict(dictionary, string=None, sorted_by_value=True):
   return
 
 
+def print_dict_html(dictionary, string=None, sorted_by_value = True):
+  body = '<table border="1px" cellspacing="0" cellpadding=3>'
+  if string:
+    body += '<tr><th colspan="2">' + string + '</th></tr>\n'
+  if not sorted_by_value:
+    sort_list = sorted(dictionary)
+  else:
+    sort_list = sorted(dictionary, key=lambda x: dictionary[x], reverse=True)
+  for name in sort_list:
+    body += '<tr><td>' + name + '</td><td>' + str(dictionary[name]) + '</td>\n'
+  body += '</tr></table>'
+  return body
+
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def print_help():
@@ -538,6 +551,37 @@ def print_help():
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
+def write_file_header(title='mcStats Result Page'):
+  """
+  write_file_header creates the header/front matter for the output html file as a string.
+  title - The title of the HTML page
+  """
+  front_text = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n' + '<html>\n<head>\n<title>' + title + '</title>\n</head>\n<body>\n'
+  front_text += '<h1>' + title + '</h1>\n'
+  front_text += '<h4> updated:&nbsp;' + str(datetime.datetime.now()) + '</h4>\n'
+  return front_text
+
+
+def write_file_footer():
+  """
+  write_file_footer creates the end/back matter for the output html file as a string
+  """
+  back_text = '</body>\n</html>'
+  return back_text
+
+def write_file_content(result, title='Output:'):
+  """
+  write_file_content creates a content part for the result given as a string.
+  result - The dictionary containing the results to create
+  """
+  body = '<div>'
+  body += '<h2>' + title + '</h2>'
+  body += print_dict_html(result, sorted_by_value=True) + '</div>'
+  return body
+
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def main():
   # variables for flags
   chat = False
@@ -545,6 +589,7 @@ def main():
   logins = False
   online_time = False
   write = False
+  outname = ''
   # input arguments
   args = sys.argv[1:]
   if not args:
@@ -556,6 +601,15 @@ def main():
     print_help()
   if '--help' in args:
     print_help()
+
+  if '--write' in args:
+    write = True
+    index = args.index('--write')
+    outname = os.path.abspath(args[index + 1])
+    if os.path.isfile(outname) & verbose:
+      print outname, 'exists, overwriting'
+    del args[index+1] # outname
+    del args[index] # --write
 
   if '--verbose' in args:
     set_verbose(True)
@@ -577,10 +631,6 @@ def main():
     deaths = True
     del args[args.index('--deaths')]
 
-  if '--write' in args:
-    write = True
-    del args[args.index('--write')]
-
   # this is just to test the regexes against a logfile
   if '--test' in args:
     test_regexes()
@@ -598,22 +648,41 @@ def main():
 
   if chat:
     chat_result = process_chats(chat_data)
-    print_dict(chat_result, 'Chats:', True)
+    if not write:
+      print_dict(chat_result, 'Chats:', True)
 
 
   if deaths:
     death_result = process_deaths(chatless_data)
-    print_dict(death_result, 'Deaths:', True)
+    if not write:
+      print_dict(death_result, 'Deaths:', True)
 
 
   if logins:
     login_result = process_logins(chatless_data)
-    print_dict(login_result, 'Logins:', True)
+    if not write:
+      print_dict(login_result, 'Logins:', True)
 
 
   if online_time:
     online_time_result = process_online_time(chatless_data)
-    print_dict(online_time_result, 'Online-Time:', True)
+    if not write:
+      print_dict(online_time_result, 'Online-Time:', True)
+
+  if write:
+    output = write_file_header()
+    if chat:
+      output += write_file_content(chat_result, 'Chat:')
+    if deaths:
+      output += write_file_content(death_result, 'Deaths:')
+    if logins:
+      output += write_file_content(login_result, 'Logins:')
+    if online_time:
+      output += write_file_content(online_time_result, 'Online Time:')
+    output += write_file_footer()
+    output_file = open(outname, 'w')
+    output_file.write(output)
+    output_file.close()
 
 # standard boilerplate
 if __name__ == '__main__':
