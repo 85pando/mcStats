@@ -309,9 +309,7 @@ def process_logins(raw_data):
 
 def process_deaths(raw_data):
   """
-  Given a list of the content of valid minecraft logfiles, process_deaths will calculate the number of deaths for
-  each user
-  player.
+  Given a list of the content of valid minecraft logfiles, process_deaths will calculate the number of deaths for each player.
   raw_data - a list of logfiles, each logfile is a string containing the whole file
   """
   # deaths will be the dictionary which contains the number of deaths
@@ -352,6 +350,44 @@ def process_deaths(raw_data):
         else:
           sys.stderr.write('found a line with a death, but no username\n\t' + line + '\n')
   return deaths
+
+
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
+def process_chats(raw_data):
+  """
+  Given a list of the content of valid minecraft logfiles, process_chats will calculate the number of times each player used the chat or emotes.
+  raw_data - a list of logfiles, each logfile is a string containing the whole file
+  """
+  # chats will be the dictionary which contains the numer of chats/emotes for each player
+  chats = {}
+  # raw_data is a list of strings, each string is one logfile
+  for logfile in raw_data:
+    # split logfile into a list of lines
+    lines = logfile.split('\n')
+    for line in lines:
+      # look if this line contains chat
+      if line == '':
+        # this may happen sometimes
+        continue
+      search_result = re.search(Regex.chat, line)
+      if not search_result:
+        # if not, this line should contain an emote
+        search_result = re.search(Regex.emote, line)
+        if not search_result:
+          # this should not happen
+          sys.stderr.write('chat-line processed, but neither chat nor emote found\n')
+          # skip this line
+          continue
+      # we have either a chat or an emote
+      user = search_result.group(1)
+      if user in chats:
+        # user has already chatted once
+        chats[user] += 1
+      else:
+        chats[user] = 1
+  return chats
 
 
 
@@ -441,7 +477,7 @@ def print_dict(dictionary, string=None, sort_list=None):
     # just print the default
     print FontStyle.bold + 'Output:' + FontStyle.normal
   if not sort_list:
-    # no special sorting prefrerences, do it alphabetically
+    # no special sorting preferences, do it alphabetically
     sort_list = sorted(dictionary)
   for name in sort_list:
     # print each entry from the sorted_list
@@ -479,6 +515,7 @@ def print_help():
 
 def main():
   # variables for flags
+  chat = False
   deaths = False
   logins = False
   online_time = False
@@ -498,6 +535,10 @@ def main():
   if '--verbose' in args:
     set_verbose(True)
     del args[args.index('--verbose')]
+
+  if '--chat' in args:
+    chat = True
+    del args[args.index('--chat')]
 
   if '--online-time' in args:
     online_time = True
@@ -527,15 +568,20 @@ def main():
   filenames = args
   raw_data = read_logfiles(filenames)
 
+  # the chat data is not really needed in the normal log file, split chat into seperate file
   (chatless_data, chat_data) = purge_chat(raw_data)
-  #print 'chatless:', chatless_data
-  #print 'chat:', chat_data
 
-  if online_time:
-    online_time_result = process_online_time(chatless_data)
-    # TODO sort results by online time
-    #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
-    print_dict(online_time_result, 'Online-Time:')
+  if chat:
+    chat_result = process_chats(chat_data)
+    sorter = sorted(chat_result, key=lambda x: chat_result[x], reverse=True)
+    print_dict(chat_result, 'Chats:', sorter)
+
+
+  if deaths:
+    death_result = process_deaths(chatless_data)
+    sorter = sorted(death_result, key=lambda x: death_result[x], reverse=True)
+    print_dict(death_result, 'Deaths:', sorter)
+
 
   if logins:
     #login_result = process_logins(raw_data)
@@ -543,10 +589,12 @@ def main():
     sorter = sorted(login_result, key=lambda x: login_result[x], reverse=True)
     print_dict(login_result, 'Logins:', sorter)
 
-  if deaths:
-    death_result = process_deaths(chatless_data)
-    sorter = sorted(death_result, key=lambda x: death_result[x], reverse=True)
-    print_dict(death_result, 'Deaths:', sorter)
+
+  if online_time:
+    online_time_result = process_online_time(chatless_data)
+    # TODO sort results by online time
+    #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
+    print_dict(online_time_result, 'Online-Time:')
 
 # standard boilerplate
 if __name__ == '__main__':
