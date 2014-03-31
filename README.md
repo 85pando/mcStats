@@ -8,6 +8,7 @@ This programm will create statistics for your minecraft server.
 * --logins: counts the logins of each user
 * --online-time: calculates the time each user was online
 * --verbose: print unimportant stuff only if requested
+* --chat: calculate the number of times each player has used chat or emotes.
 
 ## Usage
 
@@ -18,10 +19,10 @@ T.b.d. Use ```python mcStats.py --help```
 | File            | What it does/is |
 |:----------------|-----------------|
 | mcStats.py      | This is the actual script |
-| deathlist       | This file contains all possible death messages without any user/mob/item names, to allow easy parsing of them for deathmessages (not havn^ing to create regexes for this). |
-| test.log        | This is a log which contains most of the logmessages for testing the script. What is not in here will probably not be found, if not stated anywhere else. |
+| deathlist       | This file contains all possible death messages without any user/mob/item names, to allow easy parsing of them for death messages (not having to create regexes for this). |
+| test.log        | This is a log which contains most of the log messages for testing the script. What is not in here will probably not be found, if not stated anywhere else. |
 | death.log       | This is a pseudo-logfile that contains all possible death messages. |
-| serverstart.log | This is a log that is used to test if the server has been restarted for this logfile. It is used to find unclean server shutdowns or ccrashes. |
+| serverstart.log | This is a log that is used to test if the server has been restarted for this logfile. It is used to find unclean server shutdowns or crashes. |
 
 ## TODO
 

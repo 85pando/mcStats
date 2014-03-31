@@ -1,0 +1,6 @@
+.idea
+logs-old
+logs
+*.pyc
+test-real.log
+

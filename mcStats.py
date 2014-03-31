@@ -8,7 +8,6 @@ import re
 #import copy
 import datetime
 
-# global variables (ugh)
 global verbose
 verbose = False
 
@@ -140,6 +139,34 @@ def read_single_file(filename):
   return text
 
 
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
+def purge_chat(raw_data):
+  """
+  purge_chat will split the logfiles into one file containing everything but chat/emotes and one file containing only chat/emotes.
+  raw_data - a list of logfiles, each logfile is a string containing the whole file
+  """
+  chatless = []
+  chatfull = []
+  for logfile in raw_data:
+    chatlines = []
+    loglines = []
+    # logfile is the content of a single log file
+    lines = logfile.split('\n')
+    for line in lines:
+      # search for chat and emotes
+      chat = re.search(Regex.chat, line)
+      emote = re.search(Regex.emote, line)
+      # the line is either a chat/emote line, or not, put it into the according structure
+      if chat or emote:
+        chatlines.append(line)
+      else:
+        loglines.append(line)
+    loglines = '\n'.join(loglines)
+    chatlines = '\n'.join(chatlines)
+    chatless.append(loglines)
+    chatfull.append(chatlines)
+  return (chatless, chatfull)
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def process_online_time(raw_data):
@@ -427,12 +454,16 @@ def print_help():
   """
   print_help will display usage instructions for mcStats. It will stop the program after printing.
   """
+
+
   print 'Minecraft Statistics - Usage'
   print Font.bold + 'mcStats' + Font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', Font.bold + 'file [file ...]' + Font.normal
   print Font.bold + '\t--help' + Font.normal
   print '\t\tPrint the help text. If this option is given, all other options will be ignored.'
   print Font.bold + '\t--write outputfile' + Font.normal
   print '\t\tDon\'t write the output to stdout but to the outputfile.', Font.bold + Font.red + 'not yet implemented' + Font.normal
+#  print Font.bold + '\t--chat' + Font.normal
+#  print '\t\tCalculate number of times each player has used chat or emotes.'
   print Font.bold + '\t--online-time' + Font.normal
   print '\t\tCalculate the overall time each player has been online.'
   print Font.bold + '\t--logins' + Font.normal
@@ -497,19 +528,24 @@ def main():
   filenames = args
   raw_data = read_logfiles(filenames)
 
+  (chatless_data, chat_data) = purge_chat(raw_data)
+  #print 'chatless:', chatless_data
+  #print 'chat:', chat_data
+
   if online_time:
-    online_time_result = process_online_time(raw_data)
+    online_time_result = process_online_time(chatless_data)
     # TODO sort results by online time
     #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
     print_dict(online_time_result, 'Online-Time:')
 
   if logins:
-    login_result = process_logins(raw_data)
+    #login_result = process_logins(raw_data)
+    login_result = process_logins(chatless_data)
     sorter = sorted(login_result, key=lambda x: login_result[x], reverse=True)
     print_dict(login_result, 'Logins:', sorter)
 
   if deaths:
-    death_result = process_deaths(raw_data)
+    death_result = process_deaths(chatless_data)
     sorter = sorted(death_result, key=lambda x: death_result[x], reverse=True)
     print_dict(death_result, 'Deaths:', sorter)
 
