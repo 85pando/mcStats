@@ -167,7 +167,9 @@ def purge_chat(raw_data):
     chatlines = '\n'.join(chatlines)
     chatless.append(loglines)
     chatfull.append(chatlines)
-  return (chatless, chatfull)
+  return chatless, chatfull
+
+
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
 def process_online_time(raw_data):
@@ -586,7 +588,7 @@ def main():
   filenames = args
   raw_data = read_logfiles(filenames)
 
-  # the chat data is not really needed in the normal log file, split chat into seperate file
+  # the chat data is not really needed in the normal log file, split chat into separate file
   (chatless_data, chat_data) = purge_chat(raw_data)
 
   if chat:
@@ -611,8 +613,8 @@ def main():
   if online_time:
     online_time_result = process_online_time(chatless_data)
     # TODO sort results by online time
-    #sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
-    print_dict(online_time_result, 'Online-Time:')
+    sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
+    print_dict(online_time_result, 'Online-Time:', sorter)
 
 # standard boilerplate
 if __name__ == '__main__':
