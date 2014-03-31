@@ -213,10 +213,15 @@ def process_online_time(raw_data):
             del online[user]
     # lines is a list of all lines from the logfile
     for line in lines:
+      if line == '':
+        continue
       search_date = re.search(Regex.time, line)
       if not search_date:
-        if verbose:
-          sys.stderr.write('line contains no date:\n\t' + line + '\n')
+        sys.stderr.write(FontStyle.bold +
+                         'process_online_time:\n\t'
+                         + FontStyle.normal +
+                         'line contains not date:\n\t'
+                         + line + '\n')
         continue
       else:
         #timestamp = file_date + ' ' + search_date.group(1)
@@ -230,7 +235,12 @@ def process_online_time(raw_data):
         # user logged in
         if user in online:
           # this should not happen
-          sys.stderr.write('user comes online although he is already online\n\t' + file_date + ':\n\t' + line + '\n')
+          online[user] = time
+          sys.stderr.write(FontStyle.bold +
+                           'process_online_time:\n\t'
+                           + FontStyle.normal +
+                           'user logs in, although he is already online:\n\t'
+                           + line + '\n')
         else:
           # user is not online, comes online
           online[user] = time
@@ -348,7 +358,11 @@ def process_deaths(raw_data):
             # user never died before
             deaths[user] = 1
         else:
-          sys.stderr.write('found a line with a death, but no username\n\t' + line + '\n')
+          sys.stderr.write(FontStyle.bold +
+                           'process_deaths:\n\t'
+                           + FontStyle.normal +
+                           'found a line with a death, but no username:\n\t'
+                           + line + '\n')
   return deaths
 
 
@@ -378,6 +392,11 @@ def process_chats(raw_data):
         if not search_result:
           # this should not happen
           sys.stderr.write('chat-line processed, but neither chat nor emote found\n')
+          sys.stderr.write(FontStyle.bold +
+                           'process_chats:\n\t'
+                           + FontStyle.normal +
+                           'chat-line-processed, but neither chat nor emote found:\n\t'
+                           + line + '\n')
           # skip this line
           continue
       # we have either a chat or an emote
@@ -388,7 +407,6 @@ def process_chats(raw_data):
       else:
         chats[user] = 1
   return chats
-
 
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
