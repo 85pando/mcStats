@@ -214,6 +214,9 @@ def process_online_time(raw_data):
           for user in online_list:
             del online[user]
     # lines is a list of all lines from the logfile
+    if not re.search(Regex.time,lines[0]):
+      # first line may contain date inserted by this script, ignore this
+      del lines[0]
     for line in lines:
       if line == '':
         continue
@@ -222,7 +225,7 @@ def process_online_time(raw_data):
         sys.stderr.write(FontStyle.bold +
                          'process_online_time:\n\t'
                          + FontStyle.normal +
-                         'line contains not date:\n\t'
+                         'line contains no date:\n\t'
                          + line + '\n')
         continue
       else:

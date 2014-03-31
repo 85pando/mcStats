@@ -27,9 +27,9 @@ T.b.d. Use ```python mcStats.py --help```
 ## TODO
 
 * textual statistics
-    * sort online-time by online-time
+    * -sort online-time by online-time-
     * online-time relative to time first online
-    * deaths (-number of deaths,- number if times killed by xyz)
+    * deaths (-number of deaths-, number if times killed by xyz)
     * uptime
     * accept folders as input
     * find out, why some users are logged as online but come online again
