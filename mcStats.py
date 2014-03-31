@@ -483,12 +483,12 @@ def test_regexes():
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
-def print_dict(dictionary, string=None, sort_list=None):
+def print_dict(dictionary, string=None, sorted_by_value=True):
   """
   print_dict prints a dictionary in a nicely readable manner. string will be printed as a header, if given. The sort_list can be used to sort the dictionary differently. By default it will be sorted naturally after the key. This can be used to sort by the value or similar.
   dictionary - a python dictionary containing some printable stuff
   string - print something in front of the output, if nothing is supplied 'Output:' will be used
-  sort_list - supply a list of keys for output, the output will be sorted via this list, can also be used to print only parts of the dictionary (only stuff in this list will be printed), if not supplied, keys will be sorted alphabetically
+  sorted_by_value - When this is True, the printout will be sorted by the value with the highest value first. Otherwise it will be sorted alphabetically.
   """
   if string:
     # print something before the dictionary
@@ -496,9 +496,11 @@ def print_dict(dictionary, string=None, sort_list=None):
   else:
     # just print the default
     print FontStyle.bold + 'Output:' + FontStyle.normal
-  if not sort_list:
-    # no special sorting preferences, do it alphabetically
+  if sorted_by_value:
+    sort_list = sorted(dictionary, key=lambda x: dictionary[x], reverse=True)
+  else:
     sort_list = sorted(dictionary)
+
   for name in sort_list:
     # print each entry from the sorted_list
     print '\t', name + ':', dictionary[name]
@@ -593,28 +595,22 @@ def main():
 
   if chat:
     chat_result = process_chats(chat_data)
-    sorter = sorted(chat_result, key=lambda x: chat_result[x], reverse=True)
-    print_dict(chat_result, 'Chats:', sorter)
+    print_dict(chat_result, 'Chats:', True)
 
 
   if deaths:
     death_result = process_deaths(chatless_data)
-    sorter = sorted(death_result, key=lambda x: death_result[x], reverse=True)
-    print_dict(death_result, 'Deaths:', sorter)
+    print_dict(death_result, 'Deaths:', True)
 
 
   if logins:
-    #login_result = process_logins(raw_data)
     login_result = process_logins(chatless_data)
-    sorter = sorted(login_result, key=lambda x: login_result[x], reverse=True)
-    print_dict(login_result, 'Logins:', sorter)
+    print_dict(login_result, 'Logins:', True)
 
 
   if online_time:
     online_time_result = process_online_time(chatless_data)
-    # TODO sort results by online time
-    sorter = sorted(online_time_result, key=lambda x: online_time_result[x], reverse=True)
-    print_dict(online_time_result, 'Online-Time:', sorter)
+    print_dict(online_time_result, 'Online-Time:', True)
 
 # standard boilerplate
 if __name__ == '__main__':
