@@ -8,6 +8,7 @@ import re
 #import copy
 import datetime
 
+# global variables (ugh)
 global verbose
 verbose = False
 
@@ -64,9 +65,9 @@ class Regex:
 
 
 
-class Font:
+class FontStyle:
   """
-  The Font class includes some shortcuts to format the output.
+  The FontStyle class includes some shortcuts to format the output.
   """
 
   def __init__(self):
@@ -435,10 +436,10 @@ def print_dict(dictionary, string=None, sort_list=None):
   """
   if string:
     # print something before the dictionary
-    print Font.bold + string + Font.normal
+    print FontStyle.bold + string + FontStyle.normal
   else:
     # just print the default
-    print Font.bold + 'Output:' + Font.normal
+    print FontStyle.bold + 'Output:' + FontStyle.normal
   if not sort_list:
     # no special sorting prefrerences, do it alphabetically
     sort_list = sorted(dictionary)
@@ -454,23 +455,21 @@ def print_help():
   """
   print_help will display usage instructions for mcStats. It will stop the program after printing.
   """
-
-
   print 'Minecraft Statistics - Usage'
-  print Font.bold + 'mcStats' + Font.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', Font.bold + 'file [file ...]' + Font.normal
-  print Font.bold + '\t--help' + Font.normal
+  print FontStyle.bold + 'mcStats' + FontStyle.normal, '[--help] [--write outputfile] [--online-time] [--logins] [--deaths] [--verbose]', FontStyle.bold + 'file [file ...]' + FontStyle.normal
+  print FontStyle.bold + '\t--help' + FontStyle.normal
   print '\t\tPrint the help text. If this option is given, all other options will be ignored.'
-  print Font.bold + '\t--write outputfile' + Font.normal
-  print '\t\tDon\'t write the output to stdout but to the outputfile.', Font.bold + Font.red + 'not yet implemented' + Font.normal
-#  print Font.bold + '\t--chat' + Font.normal
-#  print '\t\tCalculate number of times each player has used chat or emotes.'
-  print Font.bold + '\t--online-time' + Font.normal
+  print FontStyle.bold + '\t--write outputfile' + FontStyle.normal
+  print '\t\tDon\'t write the output to stdout but to the outputfile.', FontStyle.bold + FontStyle.red + 'not yet implemented' + FontStyle.normal
+  print FontStyle.bold + '\t--chat' + FontStyle.normal
+  print '\t\tCalculate number of times each player has used chat or emotes.'
+  print FontStyle.bold + '\t--online-time' + FontStyle.normal
   print '\t\tCalculate the overall time each player has been online.'
-  print Font.bold + '\t--logins' + Font.normal
+  print FontStyle.bold + '\t--logins' + FontStyle.normal
   print '\t\tGive the number of times each player has logged in.'
-  print Font.bold + '\t--deaths' + Font.normal
+  print FontStyle.bold + '\t--deaths' + FontStyle.normal
   print '\t\tGive the number of deaths for each player.'
-  print Font.bold + '\t--verbose' + Font.normal
+  print FontStyle.bold + '\t--verbose' + FontStyle.normal
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
   exit(1)
@@ -488,7 +487,7 @@ def main():
   args = sys.argv[1:]
   if not args:
     # no arguments supplied, print warning and help
-    print Font.red + Font.bold + 'no files or options given\n' + Font.normal
+    print FontStyle.red + FontStyle.bold + 'no files or options given\n' + FontStyle.normal
     print_help()
 
   if '-h' in args:
@@ -522,7 +521,7 @@ def main():
     exit(0)
 
   if not args:
-    print Font.red + 'no files given\n' + Font.normal
+    print FontStyle.red + 'no files given\n' + FontStyle.normal
     print_help()
 
   filenames = args
