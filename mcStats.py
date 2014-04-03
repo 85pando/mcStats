@@ -138,7 +138,7 @@ def read_single_file(filename):
     # .gz files are zipped, open accordingly
     if verbose:
       print 'open gzipped file', filename
-    f = gzip.open(filename, 'rU')
+    f = gzip.open(filename, 'rb')
   else:
     # .log are plaintext files, just open
     if verbose:
