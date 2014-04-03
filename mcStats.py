@@ -507,16 +507,16 @@ def test_regexes():
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
-def print_dict(dictionary, string=None, sorted_by_value=True):
+def print_dict(dictionary, heading=None, description=None, sorted_by_value=True):
   """
   print_dict prints a dictionary in a nicely readable manner. string will be printed as a header, if given. The sort_list can be used to sort the dictionary differently. By default it will be sorted naturally after the key. This can be used to sort by the value or similar.
   dictionary - a python dictionary containing some printable stuff
   string - print something in front of the output, if nothing is supplied 'Output:' will be used
   sorted_by_value - When this is True, the printout will be sorted by the value with the highest value first. Otherwise it will be sorted alphabetically.
   """
-  if string:
+  if heading:
     # print something before the dictionary
-    print FontStyle.bold + string + FontStyle.normal
+    print FontStyle.bold + heading + FontStyle.normal
   else:
     # just print the default
     print FontStyle.bold + 'Output:' + FontStyle.normal
@@ -524,21 +524,24 @@ def print_dict(dictionary, string=None, sorted_by_value=True):
     sort_list = sorted(dictionary, key=lambda x: dictionary[x], reverse=True)
   else:
     sort_list = sorted(dictionary)
-
+  if description:
+    print '\t' + description
   for name in sort_list:
     # print each entry from the sorted_list
     print '\t', name + ':', dictionary[name]
   return
 
 
-def print_dict_html(dictionary, string=None, sorted_by_value = True):
+def print_dict_html(dictionary, description=None, heading=None, sorted_by_value=True):
   body = '<table border="1px" cellspacing="0" cellpadding=3>'
-  if string:
-    body += '<tr><th colspan="2">' + string + '</th></tr>\n'
+  if heading:
+    body += '<tr><th colspan="2">' + heading + '</th></tr>\n'
   if not sorted_by_value:
     sort_list = sorted(dictionary)
   else:
     sort_list = sorted(dictionary, key=lambda x: dictionary[x], reverse=True)
+  if description:
+    body += '<p>' + description + '</p>'
   for name in sort_list:
     body += '<tr><td>' + name + '</td><td>' + str(dictionary[name]) + '</td>\n'
   body += '</tr></table>'
@@ -590,14 +593,14 @@ def write_file_footer():
   back_text = '</body>\n</html>'
   return back_text
 
-def write_file_content(result, title='Output:'):
+def write_file_content(result, title='Output:', descr=None):
   """
   write_file_content creates a content part for the result given as a string.
   result - The dictionary containing the results to create
   """
   body = '<div>'
   body += '<h2>' + title + '</h2>'
-  body += print_dict_html(result, sorted_by_value=True) + '</div>'
+  body += print_dict_html(result, description=descr, sorted_by_value=True) + '</div>'
   return body
 
 
@@ -670,40 +673,43 @@ def main():
   if chat:
     chat_result = process_chats(chat_data)
     if not write:
-      print_dict(chat_result, 'Chats:', True)
+      print_dict(chat_result, 'Chats:', 'Number of times each user used the chat', True)
 
 
   if deaths:
     death_result = process_deaths(chatless_data)
     if not write:
-      print_dict(death_result, 'Deaths:', True)
+      print_dict(death_result, 'Deaths:', 'Number of Deaths for each user', True)
 
 
   if logins:
     login_result = process_logins(chatless_data)
     if not write:
-      print_dict(login_result, 'Logins:', True)
+      print_dict(login_result, 'Logins:', 'Number of Logins of each user', True)
 
 
   if online_time:
     online_time_result = process_online_time(chatless_data)
     if not write:
-      print_dict(online_time_result, 'Online-Time:', True)
+      print_dict(online_time_result, 'Online-Time:', 'Time each user was online.', True)
+
 
   if write:
     output = write_file_header()
     if chat:
-      output += write_file_content(chat_result, 'Chat:')
+      output += write_file_content(chat_result, 'Chat:', 'Number of times each user used the Chat.')
     if deaths:
-      output += write_file_content(death_result, 'Deaths:')
+      output += write_file_content(death_result, 'Deaths:', 'Number of times each user died.')
     if logins:
-      output += write_file_content(login_result, 'Logins:')
+      output += write_file_content(login_result, 'Logins:', 'Number of times each user logged in.')
     if online_time:
-      output += write_file_content(online_time_result, 'Online Time:')
+      output += write_file_content(online_time_result, 'Online Time:', 'Time each user was online.')
     output += write_file_footer()
     output_file = open(outname, 'w')
     output_file.write(output)
     output_file.close()
+
+
 
 # standard boilerplate
 if __name__ == '__main__':
