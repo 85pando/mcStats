@@ -5,10 +5,13 @@ This programm will create statistics for your minecraft server.
 ## Features
 
 * mcStats can read log files. It does not matter, if they are plaintex (.log) or zipped (.gz). Several option included, simple help included. Most options do nothing at the moment.  )-:
-* ```--logins```: counts the logins of each user
-* ```--online-time```: calculates the time each user was online
-* ```--verbose```: print unimportant stuff only if requested
+* ```--logins```: counts the logins of each user.
+* ```--online-time```: calculates the time each user was online.
+* ```--deaths```: calculate number of deaths.
+* ```--verbose```: print unimportant stuff only if requested.
 * ```--chat```: calculate the number of times each player has used chat or emotes.
+* ```--by-login```: calculate values for the other flags by number of logins, includes ```--logins```
+* ```--by-time```: calculates average times for the other flags, includes ```--online-time```.
 * ```--write outfile```: don't write the output to stdout but into outfile as a simple html file.
 
 ## Usage
@@ -30,7 +33,7 @@ T.b.d. Use ```python mcStats.py --help```
 * textual statistics
     * -sort online-time by online-time-
     * online-time relative to time first online
-    * deaths (-number of deaths-, number if times killed by xyz)
+    * deaths (number if times killed by xyz)
     * uptime
     * accept folders as input
     * find out, why some users are logged as online but come online again

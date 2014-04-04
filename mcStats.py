@@ -437,6 +437,27 @@ def process_chats(raw_data):
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
+def process_by_login(data_dictionary, login_dictionary):
+  by_logins = {}
+  for user in data_dictionary:
+    if user in login_dictionary:
+      by_logins[user] = data_dictionary[user] / float(login_dictionary[user])
+  return by_logins
+
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
+def process_by_time(data_dictionary, online_dictionary):
+  by_time = {}
+  for user in data_dictionary:
+    if user in online_dictionary:
+      by_time[user] =  datetime.timedelta(seconds=online_dictionary[user].total_seconds() / float(data_dictionary[user]))
+      #by_time = online_dictionary[user] / data_dictionary[user]
+  return by_time
+
+
+# >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
+
 def test_regexes():
   """
   text_regexes is used to test the regexes used to find stuff in the logfiles. This is written for the included test.log but in theory should work on any valid logfile. For the test.log you should get output for every Regex.
@@ -567,10 +588,14 @@ def print_help():
   print '\t\tGive the number of times each player has logged in.'
   print FontStyle.bold + '\t--deaths' + FontStyle.normal
   print '\t\tGive the number of deaths for each player.'
+  print FontStyle.bold + '\t--by-login' + FontStyle.normal
+  print '\t\tCalculate values for the other flags by login.'
+  print FontStyle.bold + '\t--by-time' + FontStyle.normal
+  print '\t\tCalculate values for the other flags by online time.'
   print FontStyle.bold + '\t--verbose' + FontStyle.normal
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
 
-  exit(1)
+  exit(0)
 
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
@@ -608,12 +633,14 @@ def write_file_content(result, title='Output:', descr=None):
 
 def main():
   # variables for flags
-  chat = False
-  deaths = False
-  logins = False
+  chat        = False
+  by_time     = False
+  by_logins   = False
+  deaths      = False
+  logins      = False
   online_time = False
-  write = False
-  outname = ''
+  write       = False
+  outname     = ''
   # input arguments
   args = sys.argv[1:]
   if not args:
@@ -655,6 +682,16 @@ def main():
     deaths = True
     del args[args.index('--deaths')]
 
+  if '--by-logins' in args:
+    by_logins = True
+    logins    = True
+    del args[args.index('--by-logins')]
+
+  if '--by-time' in args:
+    by_time    = True
+    online_time = True
+    del args[args.index('--by-time')]
+
   # this is just to test the regexes against a logfile
   if '--test' in args:
     test_regexes()
@@ -675,24 +712,44 @@ def main():
     if not write:
       print_dict(chat_result, 'Chats:', 'Number of times each user used the chat', True)
 
-
   if deaths:
     death_result = process_deaths(chatless_data)
     if not write:
       print_dict(death_result, 'Deaths:', 'Number of Deaths for each user', True)
-
 
   if logins:
     login_result = process_logins(chatless_data)
     if not write:
       print_dict(login_result, 'Logins:', 'Number of Logins of each user', True)
 
-
   if online_time:
     online_time_result = process_online_time(chatless_data)
     if not write:
       print_dict(online_time_result, 'Online-Time:', 'Time each user was online.', True)
 
+  if by_logins:
+    if chat:
+      # chats by login
+      chat_by_logins = process_by_login(chat_result, login_result)
+      print_dict(chat_by_logins, 'Chats by Logins:', 'Number of times each user used the chat by number of logins.', sorted_by_value=True)
+    if deaths:
+      # deaths by login
+      deaths_by_logins = process_by_login(death_result, login_result)
+      print_dict(deaths_by_logins, 'Deaths by Logins:', 'Number of times each user died by number of logins.', sorted_by_value=True)
+
+  if by_time:
+    if chat:
+      # time by chat
+      time_by_chat = process_by_time(chat_result, online_time_result)
+      print_dict(time_by_chat, 'Time by Chat', 'Time each user was online by chat message.', sorted_by_value=True)
+    if deaths:
+      # time by death
+      time_by_death = process_by_time(death_result, online_time_result)
+      print_dict(time_by_death, 'Time by Death', 'Time each user was online by Death.', sorted_by_value=True)
+    if logins:
+      # time by login
+      time_by_login = process_by_time(login_result, online_time_result)
+      print_dict(time_by_login, 'Time by Login', 'Time each user was online by login.', sorted_by_value=True)
 
   if write:
     output = write_file_header()
@@ -704,6 +761,24 @@ def main():
       output += write_file_content(login_result, 'Logins:', 'Number of times each user logged in.')
     if online_time:
       output += write_file_content(online_time_result, 'Online Time:', 'Time each user was online.')
+    if by_logins:
+      if chat:
+        # chats by login
+        output += write_file_content(chat_by_logins, 'Chats by Logins:', 'Number of times each user used the chat by number of logins.')
+      if deaths:
+        # deaths by login
+        output += write_file_content(deaths_by_logins, 'Deaths by Logins:', 'Number of times each user died by number of logins.')
+    if by_time:
+      if chat:
+        # time by chat
+        output += write_file_content(time_by_chat, 'Time by Chat', 'Time each user was online by chat message.')
+      if deaths:
+        # time by death
+        output += write_file_content(time_by_death, 'Time by Death', 'Time each user was online by Death.')
+      if logins:
+        # time by login
+        output += write_file_content(time_by_login, 'Time by Login', 'Time each user was online by login.')
+
     output += write_file_footer()
     output_file = open(outname, 'w')
     output_file.write(output)
