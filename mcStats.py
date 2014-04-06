@@ -28,11 +28,14 @@ import gzip
 import re
 #import copy
 import datetime
+from pystache import Renderer
 
 # global variables (ugh)
 global verbose
 verbose = False
 
+_NAME = "mcStats"
+layout_template = "templates/layout.mustache"
 
 def set_verbose(boolean=True):
   global verbose
@@ -600,34 +603,23 @@ def print_help():
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
-def write_file_header(title='mcStats Result Page'):
-  """
-  write_file_header creates the header/front matter for the output html file as a string.
-  title - The title of the HTML page
-  """
-  front_text = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n' + '<html>\n<head>\n<title>' + title + '</title>\n</head>\n<body>\n'
-  front_text += '<h1>' + title + '</h1>\n'
-  front_text += '<h4> updated:&nbsp;' + str(datetime.datetime.now()) + '</h4>\n'
-  return front_text
+def dict_to_arr(result_dictionary, sorted_by_value=True):
+  res = []
+  for k,v in result_dictionary.items():
+    res.append({"name" : k, "value" : v})
+  if not sorted_by_value:
+    res = sorted(res)
+  else:
+    res = sorted(res, key=lambda k: k['value'], reverse=True)
+  return res
 
+def render_html(content):
+  tplFile = open(layout_template,"r")
+  rendered = Renderer().render(tplFile.read(), content)
+  return rendered
 
-def write_file_footer():
-  """
-  write_file_footer creates the end/back matter for the output html file as a string
-  """
-  back_text = '</body>\n</html>'
-  return back_text
-
-def write_file_content(result, title='Output:', descr=None):
-  """
-  write_file_content creates a content part for the result given as a string.
-  result - The dictionary containing the results to create
-  """
-  body = '<div>'
-  body += '<h2>' + title + '</h2>'
-  body += print_dict_html(result, description=descr, sorted_by_value=True) + '</div>'
-  return body
-
+def new_section(title, description, entries_dictionary):
+  return { "title": title, "description": description, "entries" : dict_to_arr(entries_dictionary) }
 
 # >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-< >-<
 
@@ -752,36 +744,38 @@ def main():
       print_dict(time_by_login, 'Time by Login', 'Time each user was online by login.', sorted_by_value=True)
 
   if write:
-    output = write_file_header()
+    sections = []
+    content = { "title": _NAME, "generator": _NAME, "generated_at" : datetime.datetime.now().ctime(),"sections" : sections }
+
     if chat:
-      output += write_file_content(chat_result, 'Chat:', 'Number of times each user used the Chat.')
+      sections.append(new_section('Chat', 'Number of times each user died.', chat_result))
     if deaths:
-      output += write_file_content(death_result, 'Deaths:', 'Number of times each user died.')
+      sections.append(new_section('Deaths', 'Number of times each user died.', death_result))
     if logins:
-      output += write_file_content(login_result, 'Logins:', 'Number of times each user logged in.')
+      sections.append(new_section('Logins', 'Number of times each user logged in.', login_result))
     if online_time:
-      output += write_file_content(online_time_result, 'Online Time:', 'Time each user was online.')
+      sections.append(new_section('Online Time', 'Time each user was online.',online_time_result))
+
     if by_logins:
       if chat:
         # chats by login
-        output += write_file_content(chat_by_logins, 'Chats by Logins:', 'Number of times each user used the chat by number of logins.')
+        sections.append(new_section('Chats by Logins', 'Number of times each user used the chat by number of logins.', chat_by_logins))
       if deaths:
         # deaths by login
-        output += write_file_content(deaths_by_logins, 'Deaths by Logins:', 'Number of times each user died by number of logins.')
+        sections.append(new_section('Deaths by Logins', 'Number of times each user died by number of logins.', deaths_by_logins))
     if by_time:
       if chat:
         # time by chat
-        output += write_file_content(time_by_chat, 'Time by Chat', 'Time each user was online by chat message.')
+        sections.append(new_section('Time by Chat', 'Time each user was online by chat message.', time_by_chat))
       if deaths:
         # time by death
-        output += write_file_content(time_by_death, 'Time by Death', 'Time each user was online by Death.')
+        sections.append(new_section('Time by Death', 'Time each user was online by Death.', time_by_death))
       if logins:
         # time by login
-        output += write_file_content(time_by_login, 'Time by Login', 'Time each user was online by login.')
+        sections.append(new_section('Time by Login', 'Time each user was online by login.', time_by_login))
 
-    output += write_file_footer()
     output_file = open(outname, 'w')
-    output_file.write(output)
+    output_file.write(render_html(content))
     output_file.close()
 
 
