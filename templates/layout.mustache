@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>{{title}} -- {{generated_at}}</title>
+  <meta name="Generator" content="{{generator}}">
+
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/dashboard.css">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">{{title}} - updated at {{generated_at}}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            {{#sections}}
+            <li><a href="#{{ title }}">{{title}}</a></li>
+            {{/sections}}
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Statistics</h1>
+          {{#sections}}
+          <h2 id="{{title}}" class="sub-header">{{title}}</h2>
+          <p>{{description}}</p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Metric</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#entries}}
+                <tr>
+                  <td>{{name}}</td>
+                  <td>{{value}}</td>
+                </tr>
+                {{/entries}}
+              </tbody>
+            </table>
+          </div>
+          {{/sections}}
+        </div>
+      </div>
+    </div>
+</body>
+</html>
