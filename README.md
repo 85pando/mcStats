@@ -30,16 +30,15 @@ T.b.d. Use ```python mcStats.py --help```
 
 ## TODO
 
-* textual statistics
-    * -sort online-time by online-time-
-    * online-time relative to time first online
-    * deaths (number if times killed by xyz)
-    * uptime
-    * accept folders as input
-    * find out, why some users are logged as online but come online again
-* create some visual statistics for the above
+* suppress stout, if --write is given
+* accept folders as input
+* uptime
+* create some visual statistics
 * make nicer indenting for help
 * include old one-logfile format
+* online-time relative to time first online
+* number if times killed by xyz
+* find out, why some users are logged as online but come online again
 
 ## other log formats
 
