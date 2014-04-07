@@ -1,4 +1,4 @@
-#!/usr/bin/env python -tt
+#!/usr/bin/python -tt
 
 """
     mcStats is a little tool to create statistics for a minecraft server.
@@ -597,6 +597,7 @@ def print_help():
   print '\t\tCalculate values for the other flags by online time.'
   print FontStyle.bold + '\t--verbose' + FontStyle.normal
   print '\t\tPrint more stuff. Depending on the number of logfiles, this will be a mess. You have been warned.'
+  print '\nAt the moment, the css for the outputfile will ' + FontStyle.underline + 'not' + FontStyle.normal + ' not be copied along, you have to do this manually.'
 
   exit(0)
 

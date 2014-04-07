@@ -14,9 +14,16 @@ This programm will create statistics for your minecraft server.
 * ```--by-time```: calculates average times for the other flags, includes ```--online-time```.
 * ```--write outfile```: don't write the output to stdout but into outfile as a simple html file.
 
+## Installation
+
+1. Clone the repository: ```git clone https://github.com/85pando/mcStats.git mcStats```
+2. Make sure pystache is installed: ```[sudo] pip install pystache```
+
 ## Usage
 
-T.b.d. Use ```python mcStats.py --help```
+* Use ```python mcStats.py --help```.
+* Atm the css file is not copied to the output folder, has to be done manually.
+
 
 ## Files
 
@@ -31,6 +38,7 @@ T.b.d. Use ```python mcStats.py --help```
 ## TODO
 
 * suppress stout, if --write is given
+* if css not present in given directory, add css
 * accept folders as input
 * uptime
 * create some visual statistics
