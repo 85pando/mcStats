@@ -354,7 +354,7 @@ def process_deaths(raw_data):
   # deaths will be the dictionary which contains the number of deaths
   deaths = {}
   # read list of possible death causes
-  deathlist_file = open('deathlist', 'r')
+  deathlist_file = open(os.path.join(sys.path[0], 'deathlist'), 'r')
   deathlist = deathlist_file.read().split('\n')
   deathlist_file.close()
   # raw_data is a list of strings, each string is one logfile
@@ -615,7 +615,7 @@ def dict_to_arr(result_dictionary, sorted_by_value=True):
   return res
 
 def render_html(content):
-  tplFile = open(layout_template,"r")
+  tplFile = open(os.path.join(sys.path[0], layout_template),"r")
   rendered = Renderer().render(tplFile.read(), content)
   return rendered
 
