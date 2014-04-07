@@ -749,7 +749,7 @@ def main():
     content = { "title": _NAME, "generator": _NAME, "generated_at" : datetime.datetime.now().ctime(),"sections" : sections }
 
     if chat:
-      sections.append(new_section('Chat', 'Number of times each user died.', chat_result))
+      sections.append(new_section('Chat', 'Number of times each user used the chat.', chat_result))
     if deaths:
       sections.append(new_section('Deaths', 'Number of times each user died.', death_result))
     if logins:
