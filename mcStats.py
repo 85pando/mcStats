@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/env python -tt
 
 """
     mcStats is a little tool to create statistics for a minecraft server.
