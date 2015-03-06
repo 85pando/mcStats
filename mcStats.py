@@ -123,7 +123,7 @@ def read_logfiles(filenames):
       # only try to add logfiles, when they exist
       logfiles.append(read_single_file(singlefile))
     else:
-      #if verbose:
+      if verbose:
       print singlefile, 'is not a file'
   return logfiles
 
