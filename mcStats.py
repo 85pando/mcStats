@@ -117,14 +117,14 @@ def read_logfiles(filenames):
   """
   # logfiles will include one logfile for each entry as a string
   logfiles = []
-  for singlefile in filenames:
-    # singlefile will be a single logfile as string
-    if os.path.exists(os.path.abspath(singlefile)):
+  for singlefile_names in filenames:
+    # singlefile_names will be a single logfile as string
+    if os.path.exists(os.path.abspath(singlefile_names)):
       # only try to add logfiles, when they exist
-      logfiles.append(read_single_file(singlefile))
+      logfiles.append(read_single_file(singlefile_names))
     else:
       if verbose:
-          print singlefile, 'is not a file'
+          print singlefile_names, 'is not a file'
   return logfiles
 
 
