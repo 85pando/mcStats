@@ -124,7 +124,7 @@ def read_logfiles(filenames):
       logfiles.append(read_single_file(singlefile_names))
     else:
       if verbose:
-          print singlefile_names, 'is not a file'
+        print singlefile_names, 'is not a file'
   return logfiles
 
 
